@@ -29,8 +29,23 @@ export class GameManager extends Phaser.GameObjects.Sprite {
             if (player.myTurn)
               player.activateCoin = true;
           });
+          this.coins[0].isSelected = true;
+          this.coins[0].isCoinRound = true;
+          this.coins[1].isCoinRound = true;
+        } else if (!this.anyCoinActivated()) {
+          this.coins.forEach(coin => {
+            coin.alreadySelected = true;
+            if (coin.isSelected)
+              coin.isActive = true;
+          });
         } else {
           this.coinRound = false;
+          this.coins.forEach(coin => {
+            coin.isActive = false;
+            coin.isSelected = false;
+            coin.isCoinRound = false;
+            coin.alreadySelected = false;
+          });
 
           this.players.forEach(player => {
             player.myTurn = !player.myTurn;
@@ -43,5 +58,15 @@ export class GameManager extends Phaser.GameObjects.Sprite {
         this.isPressed = false;
       }
     }
+  }
+
+  private anyCoinActivated(): boolean {
+    let anyActive = false;
+    this.coins.forEach(coin => {
+      if (coin.isActive)
+        anyActive = true;
+    });
+
+    return anyActive;
   }
 }
