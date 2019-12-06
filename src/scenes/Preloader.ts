@@ -6,8 +6,8 @@ export class Preloader extends Phaser.Scene {
             key: 'preloader',
             pack: {
                 files: [
-                    { type: 'image', key: 'bar', url: './assets/images/loadBar.png' },
-                    { type: 'image', key: 'barBg', url: './assets/images/barBg.png' }
+                    { type: 'image', key: 'bar', url: 'assets/images/loadBar.png' },
+                    { type: 'image', key: 'barBg', url: 'assets/images/barBg.png' }
                 ]
             }
         });
@@ -32,10 +32,10 @@ export class Preloader extends Phaser.Scene {
             mask.fillRect(0, 0, bar.width * progress, bar.height);
         });
 
-        this.load.image('player1', '../assets/sprites/player1.png');
-        this.load.image('player2', '../assets/sprites/player2.png');
-        this.load.image('coin', '../assets/sprites/coin.png');
-        this.load.image('board', '../assets/sprites/board.png');
+        this.load.image('player1', 'assets/sprites/player1.png');
+        this.load.image('player2', 'assets/sprites/player2.png');
+        this.load.image('coin', 'assets/sprites/coin.png');
+        this.load.image('board', 'assets/sprites/board.png');
     }
 
     create() {
