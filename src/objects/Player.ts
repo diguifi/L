@@ -88,4 +88,14 @@ export class Player extends Phaser.GameObjects.Sprite {
       this.clearTint();
     }
   }
+
+  public activateCoinRound(): void {
+    if (this.myTurn)
+      this.activateCoin = true;
+  }
+
+  public deactivateCoinRound(): void {
+    this.myTurn = !this.myTurn;
+    this.activateCoin = false;
+  }
 }

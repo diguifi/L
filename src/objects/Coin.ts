@@ -86,4 +86,22 @@ export class Coin extends Phaser.GameObjects.Sprite {
       this.clearTint();
     }
   }
+
+  public activateCoinRound(selected: boolean): void {
+    this.isSelected = selected;
+    this.isCoinRound = true;
+  }
+
+  public setCoinActive(): void {
+    this.alreadySelected = true;
+    if (this.isSelected)
+      this.isActive = true;
+  }
+
+  public deactivateCoinRound(): void {
+    this.isActive = false;
+    this.isSelected = false;
+    this.isCoinRound = false;
+    this.alreadySelected = false;
+  }
 }

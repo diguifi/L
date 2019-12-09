@@ -26,30 +26,26 @@ export class GameManager extends Phaser.GameObjects.Sprite {
           this.coinRound = true;
 
           this.players.forEach(player => {
-            if (player.myTurn)
-              player.activateCoin = true;
+            player.activateCoinRound();
           });
-          this.coins[0].isSelected = true;
-          this.coins[0].isCoinRound = true;
-          this.coins[1].isCoinRound = true;
+
+          let i = 0;
+          this.coins.forEach(coin => {
+            coin.activateCoinRound(i == 0);
+            i++;
+          });
         } else if (!this.anyCoinActivated()) {
           this.coins.forEach(coin => {
-            coin.alreadySelected = true;
-            if (coin.isSelected)
-              coin.isActive = true;
+            coin.setCoinActive();
           });
         } else {
           this.coinRound = false;
           this.coins.forEach(coin => {
-            coin.isActive = false;
-            coin.isSelected = false;
-            coin.isCoinRound = false;
-            coin.alreadySelected = false;
+            coin.deactivateCoinRound();
           });
 
           this.players.forEach(player => {
-            player.myTurn = !player.myTurn;
-            player.activateCoin = false;
+            player.deactivateCoinRound();
           });
         }
       }
