@@ -9,6 +9,13 @@ const config = {
     width: 960,
     height: 540,
     pixelArt: true,
+    physics: {
+        default: 'arcade',
+        arcade: {
+            gravity: { y: 0 },
+            debug: false
+        }
+    },
     scene: [
         Preloader,
         Main

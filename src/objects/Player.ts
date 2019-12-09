@@ -10,9 +10,12 @@ export class Player extends Phaser.GameObjects.Sprite {
   private step: number = 60;
   public myTurn: boolean = true;
   public activateCoin: boolean = false;
+  public body!: any;
 
   constructor(params: any) {
     super(params.scene, params.x, params.y, params.key);
+
+    this.scene.physics.world.enable(this);
 
     this.myTurn = params.myTurn;
     this.sizeFactor = params.sizeFactor;

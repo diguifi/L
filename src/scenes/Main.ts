@@ -26,7 +26,7 @@ export class Main extends Phaser.Scene {
     this.coin1 = this.add.existing(new Coin({scene: this, x: 0, y: 0, key: 'coin', sizeFactor: this.sizeFactor, myTurn: false}).setOrigin(0, 0));
     this.coin2 = this.add.existing(new Coin({scene: this, x: step * 3, y: step * 3, key: 'coin', sizeFactor: this.sizeFactor, myTurn: false}).setOrigin(0, 0));
 
-    this.gameManager = this.add.existing(new GameManager({scene: this, x: -15, y: -15, key: '', players: [this.player1, this.player2], coins: [this.coin1, this.coin2]}));
+    this.gameManager = this.add.existing(new GameManager({scene: this, x: -15, y: -15, key: '', players: [this.player1, this.player2], coins: [this.coin1, this.coin2], board: this.board}));
 
     this.turnText = this.add.text(
       60,300,
@@ -36,6 +36,10 @@ export class Main extends Phaser.Scene {
         fontSize: 20
       }
     );
+
+    this.player1.on("overlapstart", function() {
+      console.log('oveoveoev')
+    });
   }
 
   preUpdate(): void {

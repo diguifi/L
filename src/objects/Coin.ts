@@ -14,6 +14,8 @@ export class Coin extends Phaser.GameObjects.Sprite {
   constructor(params: any) {
     super(params.scene, params.x, params.y, params.key);
 
+    this.scene.physics.world.enable(this);
+
     this.sizeFactor = params.sizeFactor;
     this.step = this.sizeFactor * 3;
     this.scaleX = this.sizeFactor;
