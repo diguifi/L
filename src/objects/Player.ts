@@ -10,18 +10,24 @@ export class Player extends Phaser.GameObjects.Sprite {
   private step: number = 60;
   public myTurn: boolean = true;
   public activateCoin: boolean = false;
-  public body!: any;
+  public transparentRectangle: Phaser.Geom.Rectangle;
 
   constructor(params: any) {
     super(params.scene, params.x, params.y, params.key);
 
     this.scene.physics.world.enable(this);
 
+    this.name = params.key;
     this.myTurn = params.myTurn;
     this.sizeFactor = params.sizeFactor;
     this.step = this.sizeFactor * 3;
     this.scaleX = this.sizeFactor;
     this.scaleY = this.sizeFactor;
+
+    if (params.key == 'player1')
+      this.transparentRectangle = new Phaser.Geom.Rectangle(this.x, (this.y + this.step), this.step, this.step * 2);
+    else
+      this.transparentRectangle = new Phaser.Geom.Rectangle((this.x + this.step), this.y, this.step, this.step * 2);
 
     this.invertKey = this.scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.CTRL);
     this.rotateKey =  this.scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
@@ -52,6 +58,8 @@ export class Player extends Phaser.GameObjects.Sprite {
         this.isPressed = false;
       }
     }
+
+    this.updateTransparentArea();
   }
 
   private anyKeyDown(): boolean {
@@ -100,5 +108,14 @@ export class Player extends Phaser.GameObjects.Sprite {
   public deactivateCoinRound(): void {
     this.myTurn = !this.myTurn;
     this.activateCoin = false;
+  }
+
+  public updateTransparentArea(): void {
+    if (this.name == 'player1') {
+      this.transparentRectangle.setPosition(this.x, (this.y + this.step));
+    }
+    else {
+      this.transparentRectangle.setPosition((this.x + this.step), this.y);
+    }
   }
 }

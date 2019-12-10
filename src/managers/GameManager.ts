@@ -87,10 +87,25 @@ export class GameManager extends Phaser.GameObjects.Sprite {
   }
 
   private notOverlapingThemselves(): boolean {
-    const player1OnPlayer2 = this.scene.physics.overlap(this.players[0], this.players[1]);
+    let player1OnPlayer2 = this.scene.physics.overlap(this.players[0], this.players[1]);
+    if (player1OnPlayer2) {
+      const theTransparentAreTouching = Phaser.Geom.Rectangle.Overlaps(this.players[0].transparentRectangle, this.players[1].transparentRectangle);
+      const player1TouchesPlayers2Transparent = this.overlapsObjectWithTransparent(this.players[0], this.players[1].transparentRectangle);
+      const player2TouchesPlayers1Transparent = this.overlapsObjectWithTransparent(this.players[1], this.players[0].transparentRectangle);
+      if (theTransparentAreTouching || player1TouchesPlayers2Transparent || player2TouchesPlayers1Transparent)
+        player1OnPlayer2 = false;
+    }
+
     const coin1OnCoin2 = this.scene.physics.overlap(this.coins[0], this.coins[1]);
     const playersOnCoins = this.scene.physics.overlap(this.players, this.coins);
 
     return !player1OnPlayer2 && !coin1OnCoin2 && !playersOnCoins;
+  }
+
+  private overlapsObjectWithTransparent(object: Phaser.GameObjects.Sprite, transparent: Phaser.Geom.Rectangle): boolean {
+    return transparent.x < object.x + object.width &&
+      transparent.x + transparent.width > object.x &&
+      transparent.y < object.y + object.height &&
+      transparent.y + transparent.height > object.y;
   }
 }
