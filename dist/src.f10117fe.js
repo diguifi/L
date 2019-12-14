@@ -117,7 +117,32 @@ parcelRequire = (function (modules, cache, entry, globalName) {
   }
 
   return newRequire;
-})({"src/objects/player.ts":[function(require,module,exports) {
+})({"src/scenes/sceneBase.ts":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var Scene =
+/** @class */
+function () {
+  function Scene(context, name, active) {
+    this.active = false;
+    this.context = context;
+    this.name = name;
+    this.active = active;
+  }
+
+  Scene.prototype.update = function () {
+    console.log('asdsd');
+  };
+
+  return Scene;
+}();
+
+exports.default = Scene;
+},{}],"src/objects/player.ts":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -156,7 +181,76 @@ function () {
 }();
 
 exports.default = Player;
-},{}],"src/index.ts":[function(require,module,exports) {
+},{}],"src/scenes/gameScene.ts":[function(require,module,exports) {
+"use strict";
+
+var __extends = this && this.__extends || function () {
+  var _extendStatics = function extendStatics(d, b) {
+    _extendStatics = Object.setPrototypeOf || {
+      __proto__: []
+    } instanceof Array && function (d, b) {
+      d.__proto__ = b;
+    } || function (d, b) {
+      for (var p in b) {
+        if (b.hasOwnProperty(p)) d[p] = b[p];
+      }
+    };
+
+    return _extendStatics(d, b);
+  };
+
+  return function (d, b) {
+    _extendStatics(d, b);
+
+    function __() {
+      this.constructor = d;
+    }
+
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+  };
+}();
+
+var __importDefault = this && this.__importDefault || function (mod) {
+  return mod && mod.__esModule ? mod : {
+    "default": mod
+  };
+};
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var sceneBase_1 = __importDefault(require("./sceneBase"));
+
+var player_1 = __importDefault(require("../objects/player"));
+
+var GameScene =
+/** @class */
+function (_super) {
+  __extends(GameScene, _super);
+
+  function GameScene(params) {
+    var _this = _super.call(this, params.context, params.name, params.active) || this;
+
+    _this.player1 = new player_1.default({
+      context: _this.context,
+      x: 50,
+      y: 50,
+      size: 10,
+      color: 'blue'
+    });
+    return _this;
+  }
+
+  GameScene.prototype.update = function () {
+    this.player1.update();
+  };
+
+  return GameScene;
+}(sceneBase_1.default);
+
+exports.default = GameScene;
+},{"./sceneBase":"src/scenes/sceneBase.ts","../objects/player":"src/objects/player.ts"}],"src/index.ts":[function(require,module,exports) {
 "use strict";
 
 var __importDefault = this && this.__importDefault || function (mod) {
@@ -169,7 +263,7 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var player_1 = __importDefault(require("./objects/player"));
+var gameScene_1 = __importDefault(require("./scenes/gameScene"));
 
 var Game =
 /** @class */
@@ -177,15 +271,14 @@ function () {
   function Game() {
     var _this = this;
 
+    this.scenes = [];
     this.canvas = document.getElementById('gameCanvas');
     this.context = this.canvas.getContext('2d');
-    this.testPlayer = new player_1.default({
+    this.scenes.push(new gameScene_1.default({
       context: this.context,
-      x: 50,
-      y: 50,
-      size: 10,
-      color: 'blue'
-    });
+      name: 'game',
+      active: true
+    }));
     window.requestAnimationFrame(function () {
       return _this.update();
     });
@@ -195,14 +288,12 @@ function () {
     var _this = this;
 
     this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
-    this.drawTestPlayer();
+    this.scenes.forEach(function (scene) {
+      if (scene.active) scene.update();
+    });
     window.requestAnimationFrame(function () {
       return _this.update();
     });
-  };
-
-  Game.prototype.drawTestPlayer = function () {
-    this.testPlayer.update();
   };
 
   return Game;
@@ -211,7 +302,7 @@ function () {
 window.onload = function () {
   var game = new Game();
 };
-},{"./objects/player":"src/objects/player.ts"}],"../../../../AppData/Roaming/npm/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
+},{"./scenes/gameScene":"src/scenes/gameScene.ts"}],"../../../../AppData/Roaming/npm/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
 var OldModule = module.bundle.Module;
@@ -239,7 +330,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "49652" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "53780" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

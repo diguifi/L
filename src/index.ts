@@ -1,22 +1,18 @@
-import Player from './objects/player';
+import Scene from './scenes/sceneBase';
+import GameScene from './scenes/gameScene';
 import PlayerParams from './dtos/playerParams';
+import SceneParams from './dtos/sceneParams';
 
 class Game {
   private readonly context: CanvasRenderingContext2D;
   private canvas: HTMLCanvasElement;
-  private testPlayer: Player;
+  private scenes: Scene[] = [];
 
   constructor() {
     this.canvas = <HTMLCanvasElement>document.getElementById('gameCanvas');
     this.context = this.canvas.getContext('2d');
 
-    this.testPlayer = new Player(<PlayerParams>{
-      context: this.context,
-      x: 50,
-      y: 50,
-      size: 10,
-      color: 'blue'
-    });
+    this.scenes.push(new GameScene(<SceneParams>{context: this.context, name: 'game', active: true}));
     
 
     window.requestAnimationFrame(() => this.update());
@@ -24,13 +20,13 @@ class Game {
 
   public update(): void {
     this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
-    this.drawTestPlayer();
+    
+    this.scenes.forEach(scene => {
+      if (scene.active)
+        scene.update();
+    });
 
     window.requestAnimationFrame(() => this.update());
-  }
-
-  public drawTestPlayer() {
-    this.testPlayer.update();
   }
 }
 
