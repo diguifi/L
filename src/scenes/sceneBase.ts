@@ -9,7 +9,5 @@ export default class Scene {
     this.active = active;
   }
 
-  public update(): void{
-    console.log('asdsd')
-  }
+  public update(): void{  }
 }

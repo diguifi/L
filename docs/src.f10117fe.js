@@ -134,9 +134,7 @@ function () {
     this.active = active;
   }
 
-  Scene.prototype.update = function () {
-    console.log('asdsd');
-  };
+  Scene.prototype.update = function () {};
 
   return Scene;
 }();
@@ -153,6 +151,8 @@ var Player =
 /** @class */
 function () {
   function Player(params) {
+    this.rotation = 0;
+    this.inverted = false;
     this.context = params.context;
     this.x = params.x;
     this.y = params.y;
@@ -162,19 +162,77 @@ function () {
 
   Player.prototype.update = function () {
     this.draw();
-    this.move();
   };
 
   Player.prototype.draw = function () {
-    this.context.beginPath();
-    this.context.rect(this.x, this.y, 50, 50);
-    this.context.closePath();
+    switch (this.rotation) {
+      case 0:
+        this.context.beginPath();
+        if (!this.inverted) this.context.rect(this.x, this.y, this.size, this.size);else this.context.rect(this.x + this.size * 2, this.y, this.size, this.size);
+        this.context.rect(this.x + this.size, this.y, this.size, this.size);
+        this.context.rect(this.x + this.size, this.y + this.size, this.size, this.size);
+        this.context.rect(this.x + this.size, this.y + this.size * 2, this.size, this.size);
+        this.context.closePath();
+        break;
+
+      case 1:
+        this.context.beginPath();
+        if (!this.inverted) this.context.rect(this.x + this.size * 2, this.y, this.size, this.size);else this.context.rect(this.x + this.size * 2, this.y + this.size * 2, this.size, this.size);
+        this.context.rect(this.x + this.size * 2, this.y + this.size, this.size, this.size);
+        this.context.rect(this.x + this.size, this.y + this.size, this.size, this.size);
+        this.context.rect(this.x, this.y + this.size, this.size, this.size);
+        this.context.closePath();
+        break;
+
+      case 2:
+        this.context.beginPath();
+        if (!this.inverted) this.context.rect(this.x + this.size * 2, this.y + this.size * 2, this.size, this.size);else this.context.rect(this.x, this.y + this.size * 2, this.size, this.size);
+        this.context.rect(this.x + this.size, this.y + this.size * 2, this.size, this.size);
+        this.context.rect(this.x + this.size, this.y + this.size, this.size, this.size);
+        this.context.rect(this.x + this.size, this.y, this.size, this.size);
+        this.context.closePath();
+        break;
+
+      case 3:
+        this.context.beginPath();
+        if (!this.inverted) this.context.rect(this.x, this.y + this.size * 2, this.size, this.size);else this.context.rect(this.x, this.y, this.size, this.size);
+        this.context.rect(this.x, this.y + this.size, this.size, this.size);
+        this.context.rect(this.x + this.size, this.y + this.size, this.size, this.size);
+        this.context.rect(this.x + this.size * 2, this.y + this.size, this.size, this.size);
+        this.context.closePath();
+        break;
+    }
+
     this.context.fillStyle = this.color;
     this.context.fill();
   };
 
   Player.prototype.move = function () {
     if (this.x < this.context.canvas.width) this.x += 1;else this.x = 0;
+  };
+
+  Player.prototype.rotate = function () {
+    if (this.rotation < 3) this.rotation++;else this.rotation = 0;
+  };
+
+  Player.prototype.invert = function () {
+    this.inverted = !this.inverted;
+  };
+
+  Player.prototype.moveRight = function () {
+    this.x += this.size;
+  };
+
+  Player.prototype.moveLeft = function () {
+    this.x -= this.size;
+  };
+
+  Player.prototype.moveDown = function () {
+    this.y += this.size;
+  };
+
+  Player.prototype.moveUp = function () {
+    this.y -= this.size;
   };
 
   return Player;
@@ -232,18 +290,36 @@ function (_super) {
   function GameScene(params) {
     var _this = _super.call(this, params.context, params.name, params.active) || this;
 
+    _this.slotSize = 50;
     _this.player1 = new player_1.default({
       context: _this.context,
-      x: 50,
-      y: 50,
-      size: 10,
+      x: _this.slotSize,
+      y: _this.slotSize,
+      size: _this.slotSize,
       color: 'blue'
     });
+    _this.player2 = new player_1.default({
+      context: _this.context,
+      x: _this.slotSize,
+      y: _this.slotSize,
+      size: _this.slotSize,
+      color: 'red'
+    });
+
+    _this.player2.rotate();
+
+    _this.player2.rotate();
+
+    _this.player2.moveDown();
+
+    _this.player2.moveLeft();
+
     return _this;
   }
 
   GameScene.prototype.update = function () {
     this.player1.update();
+    this.player2.update();
   };
 
   return GameScene;
@@ -330,7 +406,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "53780" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "59073" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
