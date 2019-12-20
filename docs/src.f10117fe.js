@@ -153,11 +153,13 @@ function () {
   function Player(params) {
     this.rotation = 0;
     this.inverted = false;
+    this.myTurn = false;
     this.context = params.context;
     this.x = params.x;
     this.y = params.y;
     this.size = params.size;
     this.color = params.color;
+    this.myTurn = params.myTurn;
   }
 
   Player.prototype.update = function () {
@@ -207,10 +209,6 @@ function () {
     this.context.fill();
   };
 
-  Player.prototype.move = function () {
-    if (this.x < this.context.canvas.width) this.x += 1;else this.x = 0;
-  };
-
   Player.prototype.rotate = function () {
     if (this.rotation < 3) this.rotation++;else this.rotation = 0;
   };
@@ -239,6 +237,63 @@ function () {
 }();
 
 exports.default = Player;
+},{}],"src/managers/inputManager.ts":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var InputManager =
+/** @class */
+function () {
+  function InputManager(player1, player2) {
+    this.players = [];
+    this.switch = false;
+    this.players.push(player1);
+    this.players.push(player2);
+    document.onkeydown = this.checkInputs.bind(this);
+  }
+
+  InputManager.prototype.checkInputs = function (e) {
+    var _this = this;
+
+    e = e || window.event;
+    this.players.forEach(function (player) {
+      if (player.myTurn) {
+        if (e.keyCode == '38') {
+          player.moveUp();
+        } else if (e.keyCode == '40') {
+          player.moveDown();
+        } else if (e.keyCode == '37') {
+          player.moveLeft();
+        } else if (e.keyCode == '39') {
+          player.moveRight();
+        } else if (e.keyCode == '32') {
+          player.rotate();
+        } else if (e.keyCode == '17') {
+          player.invert();
+        } else if (e.keyCode == '13') {
+          _this.switch = true;
+        }
+      }
+    });
+
+    if (this.switch) {
+      this.switch = false;
+      this.switchTurns();
+    }
+  };
+
+  InputManager.prototype.switchTurns = function () {
+    this.players[0].myTurn = !this.players[0].myTurn;
+    this.players[1].myTurn = !this.players[1].myTurn;
+  };
+
+  return InputManager;
+}();
+
+exports.default = InputManager;
 },{}],"src/scenes/gameScene.ts":[function(require,module,exports) {
 "use strict";
 
@@ -282,6 +337,8 @@ var sceneBase_1 = __importDefault(require("./sceneBase"));
 
 var player_1 = __importDefault(require("../objects/player"));
 
+var inputManager_1 = __importDefault(require("../managers/inputManager"));
+
 var GameScene =
 /** @class */
 function (_super) {
@@ -296,14 +353,16 @@ function (_super) {
       x: _this.slotSize,
       y: _this.slotSize,
       size: _this.slotSize,
-      color: 'blue'
+      color: 'blue',
+      myTurn: true
     });
     _this.player2 = new player_1.default({
       context: _this.context,
       x: _this.slotSize,
       y: _this.slotSize,
       size: _this.slotSize,
-      color: 'red'
+      color: 'red',
+      myTurn: false
     });
 
     _this.player2.rotate();
@@ -314,6 +373,7 @@ function (_super) {
 
     _this.player2.moveLeft();
 
+    _this.inputManager = new inputManager_1.default(_this.player1, _this.player2);
     return _this;
   }
 
@@ -326,7 +386,7 @@ function (_super) {
 }(sceneBase_1.default);
 
 exports.default = GameScene;
-},{"./sceneBase":"src/scenes/sceneBase.ts","../objects/player":"src/objects/player.ts"}],"src/index.ts":[function(require,module,exports) {
+},{"./sceneBase":"src/scenes/sceneBase.ts","../objects/player":"src/objects/player.ts","../managers/inputManager":"src/managers/inputManager.ts"}],"src/index.ts":[function(require,module,exports) {
 "use strict";
 
 var __importDefault = this && this.__importDefault || function (mod) {
@@ -406,7 +466,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "59073" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "64294" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

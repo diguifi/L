@@ -8,6 +8,7 @@ export default class Player {
   public y: number;
   public size: number;
   public color: string;
+  public myTurn: boolean = false;
 
   constructor(params: PlayerParams) {
     this.context = params.context;
@@ -15,6 +16,7 @@ export default class Player {
     this.y = params.y;
     this.size = params.size;
     this.color = params.color;
+    this.myTurn = params.myTurn;
   }
 
   public update(): void {
@@ -71,13 +73,6 @@ export default class Player {
 
     this.context.fillStyle = this.color;
     this.context.fill();
-  }
-  
-  private move(): void {
-    if (this.x < this.context.canvas.width)
-      this.x += 1;
-    else
-      this.x = 0;
   }
 
   public rotate(): void {
