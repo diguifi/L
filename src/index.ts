@@ -1,6 +1,5 @@
 import Scene from './scenes/sceneBase';
 import GameScene from './scenes/gameScene';
-import PlayerParams from './dtos/playerParams';
 import SceneParams from './dtos/sceneParams';
 
 class Game {

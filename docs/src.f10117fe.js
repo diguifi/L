@@ -237,6 +237,40 @@ function () {
 }();
 
 exports.default = Player;
+},{}],"src/objects/board.ts":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var Board =
+/** @class */
+function () {
+  function Board(params) {
+    this.context = params.context;
+    this.x = params.x;
+    this.y = params.y;
+    this.size = params.size;
+    this.color = params.color;
+  }
+
+  Board.prototype.update = function () {
+    this.draw();
+  };
+
+  Board.prototype.draw = function () {
+    this.context.beginPath();
+    this.context.rect(this.x, this.y, this.size * 4, this.size * 4);
+    this.context.closePath();
+    this.context.fillStyle = this.color;
+    this.context.fill();
+  };
+
+  return Board;
+}();
+
+exports.default = Board;
 },{}],"src/managers/inputManager.ts":[function(require,module,exports) {
 "use strict";
 
@@ -337,6 +371,8 @@ var sceneBase_1 = __importDefault(require("./sceneBase"));
 
 var player_1 = __importDefault(require("../objects/player"));
 
+var board_1 = __importDefault(require("../objects/board"));
+
 var inputManager_1 = __importDefault(require("../managers/inputManager"));
 
 var GameScene =
@@ -348,10 +384,17 @@ function (_super) {
     var _this = _super.call(this, params.context, params.name, params.active) || this;
 
     _this.slotSize = 50;
+    _this.board = new board_1.default({
+      context: _this.context,
+      x: 0,
+      y: 0,
+      size: _this.slotSize,
+      color: 'gray'
+    });
     _this.player1 = new player_1.default({
       context: _this.context,
       x: _this.slotSize,
-      y: _this.slotSize,
+      y: 0,
       size: _this.slotSize,
       color: 'blue',
       myTurn: true
@@ -369,8 +412,6 @@ function (_super) {
 
     _this.player2.rotate();
 
-    _this.player2.moveDown();
-
     _this.player2.moveLeft();
 
     _this.inputManager = new inputManager_1.default(_this.player1, _this.player2);
@@ -378,6 +419,7 @@ function (_super) {
   }
 
   GameScene.prototype.update = function () {
+    this.board.update();
     this.player1.update();
     this.player2.update();
   };
@@ -386,7 +428,7 @@ function (_super) {
 }(sceneBase_1.default);
 
 exports.default = GameScene;
-},{"./sceneBase":"src/scenes/sceneBase.ts","../objects/player":"src/objects/player.ts","../managers/inputManager":"src/managers/inputManager.ts"}],"src/index.ts":[function(require,module,exports) {
+},{"./sceneBase":"src/scenes/sceneBase.ts","../objects/player":"src/objects/player.ts","../objects/board":"src/objects/board.ts","../managers/inputManager":"src/managers/inputManager.ts"}],"src/index.ts":[function(require,module,exports) {
 "use strict";
 
 var __importDefault = this && this.__importDefault || function (mod) {
@@ -466,7 +508,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "64294" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "62670" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
