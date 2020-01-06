@@ -1,10 +1,13 @@
 import Player from '../objects/player';
+import GameManager from './gameManager';
 
 export default class InputManager {
   private players: Player[] = [];
+  private gameManager: GameManager;
   private switch: boolean = false;
 
-  constructor (player1: Player, player2: Player) {
+  constructor (gameManager: GameManager, player1: Player, player2: Player) {
+    this.gameManager = gameManager;
     this.players.push(player1);
     this.players.push(player2);
 
@@ -42,12 +45,7 @@ export default class InputManager {
 
     if (this.switch) {
       this.switch = false;
-      this.switchTurns();
+      this.gameManager.switchTurns();
     }
-  }
-
-  private switchTurns(): void {
-    this.players[0].myTurn = !this.players[0].myTurn;
-    this.players[1].myTurn = !this.players[1].myTurn;
   }
 }
