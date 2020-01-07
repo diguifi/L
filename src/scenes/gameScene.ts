@@ -25,7 +25,7 @@ export default class GameScene extends Scene {
       x: 0,
       y: 0,
       size: this.slotSize,
-      color: 'gray',
+      color: '#7f8c8d',
     });
 
     this.player1 = new Player(<PlayerParams>{
@@ -33,7 +33,7 @@ export default class GameScene extends Scene {
       x: this.slotSize,
       y: 0,
       size: this.slotSize,
-      color: 'blue',
+      color: '#3498db',
       myTurn: true,
     });
 
@@ -42,7 +42,7 @@ export default class GameScene extends Scene {
       x: this.slotSize,
       y: this.slotSize,
       size: this.slotSize,
-      color: 'red',
+      color: '#e74c3c',
       myTurn: false,
     });
     this.player2.rotate();
@@ -54,7 +54,7 @@ export default class GameScene extends Scene {
       x: 0,
       y: 0,
       size: this.slotSize,
-      color: 'yellow',
+      color: '#f1c40f',
     });
 
     this.coin2 = new Coin(<CoinParams>{
@@ -62,7 +62,7 @@ export default class GameScene extends Scene {
       x: this.slotSize * 3,
       y: this.slotSize * 3,
       size: this.slotSize,
-      color: 'yellow',
+      color: '#f1c40f',
     });
 
     this.gameManager = new GameManager(this.player1, this.player2, this.coin1, this.coin2, this.board);

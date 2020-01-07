@@ -1,4 +1,5 @@
 import PlayerParams from '../dtos/playerParams';
+import { darken } from '../managers/colorManager';
 
 export default class Player {
   private context: CanvasRenderingContext2D;
@@ -71,7 +72,10 @@ export default class Player {
         break;
     }
 
-    this.context.fillStyle = this.color;
+    if (this.myTurn)
+      this.context.fillStyle = this.color;
+    else
+      this.context.fillStyle = darken(this.color, 10);
     this.context.fill();
   }
 
