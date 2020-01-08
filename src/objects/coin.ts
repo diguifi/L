@@ -1,4 +1,5 @@
 import CoinParams from '../dtos/coinParams';
+import { darken } from '../managers/colorManager';
 
 export default class Coin {
   private context: CanvasRenderingContext2D;
@@ -6,7 +7,8 @@ export default class Coin {
   public y: number;
   public size: number;
   public color: string;
-  public coinRound: boolean = false;
+  public selected: boolean = false;
+  public active: boolean = false;
 
   constructor(params: CoinParams) {
     this.context = params.context;
@@ -25,7 +27,10 @@ export default class Coin {
     this.context.rect(this.x, this.y, this.size, this.size);
     this.context.closePath();
 
-    this.context.fillStyle = this.color;
+    if (this.active)
+      this.context.fillStyle = this.color;
+    else
+      this.context.fillStyle = darken(this.color, 10);
     this.context.fill();
   }
 

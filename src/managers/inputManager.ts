@@ -2,14 +2,11 @@ import Player from '../objects/player';
 import GameManager from './gameManager';
 
 export default class InputManager {
-  private players: Player[] = [];
   private gameManager: GameManager;
   private switch: boolean = false;
 
-  constructor (gameManager: GameManager, player1: Player, player2: Player) {
+  constructor (gameManager: GameManager) {
     this.gameManager = gameManager;
-    this.players.push(player1);
-    this.players.push(player2);
 
     document.onkeydown = this.checkInputs.bind(this);
   }
@@ -17,35 +14,69 @@ export default class InputManager {
   private checkInputs(e: any): any {
     e = e || window.event;
 
-    this.players.forEach(player => {
-      if (player.myTurn) {
-        if (e.keyCode == '38') {
-          player.moveUp();
+    if (!this.gameManager.selectingCoin && !this.gameManager.coinRound) {
+      this.gameManager.players.forEach(player => {
+        if (player.myTurn) {
+          if (e.keyCode == '38') {
+            player.moveUp();
+          }
+          else if (e.keyCode == '40') {
+            player.moveDown();
+          }
+          else if (e.keyCode == '37') {
+            player.moveLeft();
+          }
+          else if (e.keyCode == '39') {
+            player.moveRight();
+          }
+          else if (e.keyCode == '32') {
+            player.rotate();
+          }
+          else if (e.keyCode == '17') {
+            player.invert();
+          }
+          else if (e.keyCode == '13') {
+            this.switch = true;
+          }
         }
-        else if (e.keyCode == '40') {
-          player.moveDown();
-        }
-        else if (e.keyCode == '37') {
-          player.moveLeft();
+      });
+    } else {
+      if (!this.gameManager.coinRound) {
+        if (e.keyCode == '37') {
+          this.gameManager.changeActiveCoin();
         }
         else if (e.keyCode == '39') {
-          player.moveRight();
-        }
-        else if (e.keyCode == '32') {
-          player.rotate();
-        }
-        else if (e.keyCode == '17') {
-          player.invert();
+          this.gameManager.changeActiveCoin();
         }
         else if (e.keyCode == '13') {
           this.switch = true;
         }
+      } else {
+        this.gameManager.coins.forEach(coin => {
+          if (coin.active) {
+            if (e.keyCode == '38') {
+              coin.moveUp();
+            }
+            else if (e.keyCode == '40') {
+              coin.moveDown();
+            }
+            else if (e.keyCode == '37') {
+              coin.moveLeft();
+            }
+            else if (e.keyCode == '39') {
+              coin.moveRight();
+            }
+            else if (e.keyCode == '13') {
+              this.switch = true;
+            }
+          }
+        });
       }
-    });
+    }
 
     if (this.switch) {
       this.switch = false;
-      this.gameManager.switchTurns();
+      this.gameManager.changeGameState();
     }
   }
 }

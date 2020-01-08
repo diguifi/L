@@ -140,12 +140,48 @@ function () {
 }();
 
 exports.default = Scene;
+},{}],"src/managers/colorManager.ts":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+function darken(color, amount) {
+  color = color.indexOf("#") >= 0 ? color.substring(1, color.length) : color;
+  amount = Math.floor(255 * amount / 100);
+  return "#" + subtractLight(color.substring(0, 2), amount) + subtractLight(color.substring(2, 4), amount) + subtractLight(color.substring(4, 6), amount);
+}
+
+exports.darken = darken;
+
+function lighten(color, amount) {
+  color = color.indexOf("#") >= 0 ? color.substring(1, color.length) : color;
+  amount = Math.floor(255 * amount / 100);
+  return color = "#" + addLight(color.substring(0, 2), amount) + addLight(color.substring(2, 4), amount) + addLight(color.substring(4, 6), amount);
+}
+
+exports.lighten = lighten;
+
+function subtractLight(color, amount) {
+  var cc = parseInt(color, 16) - amount;
+  var c = cc < 0 ? 0 : cc;
+  return c.toString(16).length > 1 ? c.toString(16) : "0" + c.toString(16);
+}
+
+function addLight(color, amount) {
+  var cc = parseInt(color, 16) + amount;
+  var c = cc > 255 ? 255 : cc;
+  return c.toString(16).length > 1 ? c.toString(16) : "0" + c.toString(16);
+}
 },{}],"src/objects/player.ts":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+
+var colorManager_1 = require("../managers/colorManager");
 
 var Player =
 /** @class */
@@ -205,7 +241,7 @@ function () {
         break;
     }
 
-    this.context.fillStyle = this.color;
+    if (this.myTurn) this.context.fillStyle = this.color;else this.context.fillStyle = colorManager_1.darken(this.color, 10);
     this.context.fill();
   };
 
@@ -237,7 +273,61 @@ function () {
 }();
 
 exports.default = Player;
-},{}],"src/objects/board.ts":[function(require,module,exports) {
+},{"../managers/colorManager":"src/managers/colorManager.ts"}],"src/objects/coin.ts":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var colorManager_1 = require("../managers/colorManager");
+
+var Coin =
+/** @class */
+function () {
+  function Coin(params) {
+    this.selected = false;
+    this.active = false;
+    this.context = params.context;
+    this.x = params.x;
+    this.y = params.y;
+    this.size = params.size;
+    this.color = params.color;
+  }
+
+  Coin.prototype.update = function () {
+    this.draw();
+  };
+
+  Coin.prototype.draw = function () {
+    this.context.beginPath();
+    this.context.rect(this.x, this.y, this.size, this.size);
+    this.context.closePath();
+    if (this.active) this.context.fillStyle = this.color;else this.context.fillStyle = colorManager_1.darken(this.color, 10);
+    this.context.fill();
+  };
+
+  Coin.prototype.moveRight = function () {
+    this.x += this.size;
+  };
+
+  Coin.prototype.moveLeft = function () {
+    this.x -= this.size;
+  };
+
+  Coin.prototype.moveDown = function () {
+    this.y += this.size;
+  };
+
+  Coin.prototype.moveUp = function () {
+    this.y -= this.size;
+  };
+
+  return Coin;
+}();
+
+exports.default = Coin;
+},{"../managers/colorManager":"src/managers/colorManager.ts"}],"src/objects/board.ts":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -281,11 +371,9 @@ Object.defineProperty(exports, "__esModule", {
 var InputManager =
 /** @class */
 function () {
-  function InputManager(player1, player2) {
-    this.players = [];
+  function InputManager(gameManager) {
     this.switch = false;
-    this.players.push(player1);
-    this.players.push(player2);
+    this.gameManager = gameManager;
     document.onkeydown = this.checkInputs.bind(this);
   }
 
@@ -293,42 +381,141 @@ function () {
     var _this = this;
 
     e = e || window.event;
-    this.players.forEach(function (player) {
-      if (player.myTurn) {
-        if (e.keyCode == '38') {
-          player.moveUp();
-        } else if (e.keyCode == '40') {
-          player.moveDown();
-        } else if (e.keyCode == '37') {
-          player.moveLeft();
-        } else if (e.keyCode == '39') {
-          player.moveRight();
-        } else if (e.keyCode == '32') {
-          player.rotate();
-        } else if (e.keyCode == '17') {
-          player.invert();
-        } else if (e.keyCode == '13') {
-          _this.switch = true;
+
+    if (!this.gameManager.selectingCoin && !this.gameManager.coinRound) {
+      this.gameManager.players.forEach(function (player) {
+        if (player.myTurn) {
+          if (e.keyCode == '38') {
+            player.moveUp();
+          } else if (e.keyCode == '40') {
+            player.moveDown();
+          } else if (e.keyCode == '37') {
+            player.moveLeft();
+          } else if (e.keyCode == '39') {
+            player.moveRight();
+          } else if (e.keyCode == '32') {
+            player.rotate();
+          } else if (e.keyCode == '17') {
+            player.invert();
+          } else if (e.keyCode == '13') {
+            _this.switch = true;
+          }
         }
+      });
+    } else {
+      if (!this.gameManager.coinRound) {
+        if (e.keyCode == '37') {
+          this.gameManager.changeActiveCoin();
+        } else if (e.keyCode == '39') {
+          this.gameManager.changeActiveCoin();
+        } else if (e.keyCode == '13') {
+          this.switch = true;
+        }
+      } else {
+        this.gameManager.coins.forEach(function (coin) {
+          if (coin.active) {
+            if (e.keyCode == '38') {
+              coin.moveUp();
+            } else if (e.keyCode == '40') {
+              coin.moveDown();
+            } else if (e.keyCode == '37') {
+              coin.moveLeft();
+            } else if (e.keyCode == '39') {
+              coin.moveRight();
+            } else if (e.keyCode == '13') {
+              _this.switch = true;
+            }
+          }
+        });
       }
-    });
+    }
 
     if (this.switch) {
       this.switch = false;
-      this.switchTurns();
+      this.gameManager.changeGameState();
     }
-  };
-
-  InputManager.prototype.switchTurns = function () {
-    this.players[0].myTurn = !this.players[0].myTurn;
-    this.players[1].myTurn = !this.players[1].myTurn;
   };
 
   return InputManager;
 }();
 
 exports.default = InputManager;
-},{}],"src/scenes/gameScene.ts":[function(require,module,exports) {
+},{}],"src/managers/gameManager.ts":[function(require,module,exports) {
+"use strict";
+
+var __importDefault = this && this.__importDefault || function (mod) {
+  return mod && mod.__esModule ? mod : {
+    "default": mod
+  };
+};
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var inputManager_1 = __importDefault(require("./inputManager"));
+
+var GameManager =
+/** @class */
+function () {
+  function GameManager(player1, player2, coin1, coin2, board) {
+    this.players = [];
+    this.coinRound = false;
+    this.selectingCoin = false;
+    this.coins = [];
+    this.players.push(player1);
+    this.players.push(player2);
+    this.coins.push(coin1);
+    this.coins.push(coin2);
+    this.board = board;
+    this.inputManager = new inputManager_1.default(this);
+  }
+
+  GameManager.prototype.activateCoinSelection = function () {
+    this.selectingCoin = true;
+    this.coins[0].active = true;
+  };
+
+  GameManager.prototype.activateCoinRound = function () {
+    this.selectingCoin = false;
+    this.coinRound = true;
+  };
+
+  GameManager.prototype.finishCoinRound = function () {
+    this.coinRound = false;
+    this.coins[0].active = false;
+    this.coins[1].active = false;
+  };
+
+  GameManager.prototype.switchTurns = function () {
+    this.players[0].myTurn = !this.players[0].myTurn;
+    this.players[1].myTurn = !this.players[1].myTurn;
+  };
+
+  GameManager.prototype.changeGameState = function () {
+    if (!this.coinRound) {
+      if (!this.selectingCoin) {
+        this.activateCoinSelection();
+      } else {
+        this.activateCoinRound();
+      }
+    } else {
+      this.finishCoinRound();
+      this.switchTurns();
+    }
+  };
+
+  GameManager.prototype.changeActiveCoin = function () {
+    this.coins.forEach(function (coin) {
+      coin.active = !coin.active;
+    });
+  };
+
+  return GameManager;
+}();
+
+exports.default = GameManager;
+},{"./inputManager":"src/managers/inputManager.ts"}],"src/scenes/gameScene.ts":[function(require,module,exports) {
 "use strict";
 
 var __extends = this && this.__extends || function () {
@@ -371,9 +558,11 @@ var sceneBase_1 = __importDefault(require("./sceneBase"));
 
 var player_1 = __importDefault(require("../objects/player"));
 
+var coin_1 = __importDefault(require("../objects/coin"));
+
 var board_1 = __importDefault(require("../objects/board"));
 
-var inputManager_1 = __importDefault(require("../managers/inputManager"));
+var gameManager_1 = __importDefault(require("../managers/gameManager"));
 
 var GameScene =
 /** @class */
@@ -389,14 +578,14 @@ function (_super) {
       x: 0,
       y: 0,
       size: _this.slotSize,
-      color: 'gray'
+      color: '#7f8c8d'
     });
     _this.player1 = new player_1.default({
       context: _this.context,
       x: _this.slotSize,
       y: 0,
       size: _this.slotSize,
-      color: 'blue',
+      color: '#3498db',
       myTurn: true
     });
     _this.player2 = new player_1.default({
@@ -404,7 +593,7 @@ function (_super) {
       x: _this.slotSize,
       y: _this.slotSize,
       size: _this.slotSize,
-      color: 'red',
+      color: '#e74c3c',
       myTurn: false
     });
 
@@ -414,7 +603,21 @@ function (_super) {
 
     _this.player2.moveLeft();
 
-    _this.inputManager = new inputManager_1.default(_this.player1, _this.player2);
+    _this.coin1 = new coin_1.default({
+      context: _this.context,
+      x: 0,
+      y: 0,
+      size: _this.slotSize,
+      color: '#f1c40f'
+    });
+    _this.coin2 = new coin_1.default({
+      context: _this.context,
+      x: _this.slotSize * 3,
+      y: _this.slotSize * 3,
+      size: _this.slotSize,
+      color: '#f1c40f'
+    });
+    _this.gameManager = new gameManager_1.default(_this.player1, _this.player2, _this.coin1, _this.coin2, _this.board);
     return _this;
   }
 
@@ -422,13 +625,15 @@ function (_super) {
     this.board.update();
     this.player1.update();
     this.player2.update();
+    this.coin1.update();
+    this.coin2.update();
   };
 
   return GameScene;
 }(sceneBase_1.default);
 
 exports.default = GameScene;
-},{"./sceneBase":"src/scenes/sceneBase.ts","../objects/player":"src/objects/player.ts","../objects/board":"src/objects/board.ts","../managers/inputManager":"src/managers/inputManager.ts"}],"src/index.ts":[function(require,module,exports) {
+},{"./sceneBase":"src/scenes/sceneBase.ts","../objects/player":"src/objects/player.ts","../objects/coin":"src/objects/coin.ts","../objects/board":"src/objects/board.ts","../managers/gameManager":"src/managers/gameManager.ts"}],"src/index.ts":[function(require,module,exports) {
 "use strict";
 
 var __importDefault = this && this.__importDefault || function (mod) {
@@ -508,7 +713,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "62670" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "63129" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
