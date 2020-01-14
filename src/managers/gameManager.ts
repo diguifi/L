@@ -10,6 +10,10 @@ export default class GameManager {
   public coins: Coin[] = [];
   private board: Board;
   private inputManager: InputManager;
+  private boardMatrix: any[] = [[3,1,1,0],
+                                [0,2,1,0],
+                                [0,2,1,0],
+                                [0,2,2,4]];
 
   constructor (player1: Player, player2: Player,
     coin1: Coin, coin2: Coin,

@@ -5,4 +5,5 @@ export default interface PlayerParams{
   size: number;
   color: string;
   myTurn: boolean;
+  playerNumber: number;
 }

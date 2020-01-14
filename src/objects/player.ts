@@ -10,6 +10,7 @@ export default class Player {
   public size: number;
   public color: string;
   public myTurn: boolean = false;
+  public playerNumber: number = 0;
 
   constructor(params: PlayerParams) {
     this.context = params.context;
@@ -18,6 +19,7 @@ export default class Player {
     this.size = params.size;
     this.color = params.color;
     this.myTurn = params.myTurn;
+    this.playerNumber = params.playerNumber;
   }
 
   public update(): void {
@@ -25,9 +27,9 @@ export default class Player {
   }
 
   private draw(): void {
+    this.context.beginPath();
     switch(this.rotation) {
       case 0:
-        this.context.beginPath();
         if (!this.inverted)
           this.context.rect(this.x, this.y, this.size, this.size);
         else
@@ -38,7 +40,6 @@ export default class Player {
         this.context.closePath();
         break;
       case 1:
-        this.context.beginPath();
         if (!this.inverted)
           this.context.rect(this.x + this.size * 2, this.y, this.size, this.size);
         else
@@ -49,7 +50,6 @@ export default class Player {
         this.context.closePath();
         break;
       case 2:
-        this.context.beginPath();
         if (!this.inverted)
           this.context.rect(this.x + this.size * 2, this.y + this.size * 2, this.size, this.size);
         else
@@ -60,7 +60,6 @@ export default class Player {
         this.context.closePath();
         break;
       case 3:
-        this.context.beginPath();
         if (!this.inverted)
           this.context.rect(this.x, this.y + this.size * 2, this.size, this.size);
         else
@@ -77,6 +76,88 @@ export default class Player {
     else
       this.context.fillStyle = darken(this.color, 10);
     this.context.fill();
+
+    if (this.myTurn)
+      console.log(this.calculatePositionOnMatrix());
+  }
+
+  private calculatePositionOnMatrix(): any[] {
+    let matrix = [[0,0,0,0],
+                  [0,0,0,0],
+                  [0,0,0,0],
+                  [0,0,0,0],];
+
+    let squareNumber = 0;
+    let emptySpots = [];
+    let height = 3;
+    let width = 2;
+    let placementAdjusterX = 0;
+    let placementAdjusterY = 0;
+
+    switch(this.rotation) {
+      case 0:
+        height = 3;
+        width = 2;
+
+        if (!this.inverted) {
+          emptySpots = [3,5];
+        }
+        else {
+          emptySpots = [4,6];
+          placementAdjusterX = this.size;
+        }
+        break;
+      case 1:
+        height = 2;
+        width = 3;
+
+        if (!this.inverted) {
+          emptySpots = [1,2];
+        }
+        else {
+          emptySpots = [4,5];
+          placementAdjusterY = this.size;
+        }
+        break;
+      case 2:
+        height = 3;
+        width = 2;
+
+        if (!this.inverted) {
+          emptySpots = [2,4];
+          placementAdjusterX = this.size;
+        }
+        else {
+          emptySpots = [1,3];
+        }
+        break;
+      case 3:
+        height = 2;
+        width = 3;
+
+        if (!this.inverted) {
+          emptySpots = [5,6];
+          placementAdjusterY = this.size;
+        }
+        else {
+          emptySpots = [2,3];
+        }
+        break;
+    }
+
+    for(let i = (this.y + placementAdjusterY)/this.size; i<((this.y + placementAdjusterY)/this.size) + height;i++) {
+      for (let j = (this.x + placementAdjusterX)/this.size; j < ((this.x + placementAdjusterX)/this.size) + width; j++) {
+        squareNumber++;
+        if (squareNumber != emptySpots[0] && squareNumber != emptySpots[1]) {
+          if ((i >= 0 && i < matrix.length) && (j >= 0 && j < matrix[0].length))
+            matrix[i][j] = this.playerNumber;
+          else
+            matrix[0][0] = 9;
+        }
+      }
+    }
+
+    return matrix;
   }
 
   public rotate(): void {

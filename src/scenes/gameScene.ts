@@ -35,6 +35,7 @@ export default class GameScene extends Scene {
       size: this.slotSize,
       color: '#3498db',
       myTurn: true,
+      playerNumber: 1,
     });
 
     this.player2 = new Player(<PlayerParams>{
@@ -44,6 +45,7 @@ export default class GameScene extends Scene {
       size: this.slotSize,
       color: '#e74c3c',
       myTurn: false,
+      playerNumber: 2,
     });
     this.player2.rotate();
     this.player2.rotate();
