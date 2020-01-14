@@ -1,6 +1,46 @@
 <html>
-<body>
-  <canvas id="gameCanvas" width="490" height="490"></canvas>
-  <script src="src.f10117fe.js"></script>
-</body>
+  <head>
+    <title>L</title>
+  <script src="style.78032849.js"></script></head>
+  <body>
+
+      <div id="homePage" class="home">
+        <div class="wrapper fullscreen">
+          <header class="header">The hardest easy game</header>
+          <div class="main">
+            <input class="btn" type="submit" value="Play!" onclick="goToGame()">
+          </div>
+          <footer class="footer"></footer>
+        </div>
+      </div>
+
+      <div id="gamePage" class="game">
+        <div class="wrapper fullscreen">
+          <header class="header">The hardest easy game</header>
+          <div class="main">
+            <canvas id="gameCanvas" width="360" height="360"></canvas> 
+          </div>
+          <aside class="aside aside-1" id="turn">Turn: Player 1</aside>
+          <aside class="aside aside-2" id="timer">00:00</aside>
+          <footer class="footer">
+            <input class="btn" type="submit" value="Exit" onclick="goToHome()">
+          </footer>
+        </div>
+      </div>
+
+    <script src="src.f10117fe.js"></script>
+    <script>var homePage = document.getElementById('homePage');
+var gamePage = document.getElementById('gamePage');
+
+function goToGame() {
+  homePage.style.display = 'none';
+  gamePage.style.display = 'block';
+}
+
+function goToHome() {
+  gamePage.style.display = 'none';
+  homePage.style.display = 'block';
+}</script>
+    <link rel="stylesheet" type="text/css" href="style.78032849.css">
+  </body>
 </html>

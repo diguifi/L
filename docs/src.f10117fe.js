@@ -553,12 +553,14 @@ function () {
     this.coinRound = false;
     this.selectingCoin = false;
     this.coins = [];
+    this.turnElement = document.getElementById('turn');
     this.boardMatrix = [[3, 1, 1, 0], [0, 2, 1, 0], [0, 2, 1, 0], [0, 2, 2, 4]];
     this.players.push(player1);
     this.players.push(player2);
     this.coins.push(coin1);
     this.coins.push(coin2);
     this.board = board;
+    this.turnElement.innerHTML = "Turn: Player " + (this.players[0].myTurn ? '1' : '2');
     this.inputManager = new inputManager_1.default(this);
   }
 
@@ -581,6 +583,7 @@ function () {
   GameManager.prototype.switchTurns = function () {
     this.players[0].myTurn = !this.players[0].myTurn;
     this.players[1].myTurn = !this.players[1].myTurn;
+    this.turnElement.innerHTML = "Turn: Player " + (this.players[0].myTurn ? '1' : '2');
   };
 
   GameManager.prototype.validMove = function () {
@@ -763,13 +766,13 @@ function (_super) {
   function GameScene(params) {
     var _this = _super.call(this, params.context, params.name, params.active) || this;
 
-    _this.slotSize = 50;
+    _this.slotSize = 90;
     _this.board = new board_1.default({
       context: _this.context,
       x: 0,
       y: 0,
       size: _this.slotSize,
-      color: '#7f8c8d'
+      color: '#bdc3c7'
     });
     _this.player1 = new player_1.default({
       context: _this.context,
@@ -908,7 +911,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "60158" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "51478" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

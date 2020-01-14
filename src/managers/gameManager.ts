@@ -9,6 +9,7 @@ export default class GameManager {
   public selectingCoin: boolean = false;
   public coins: Coin[] = [];
   private board: Board;
+  private turnElement: HTMLElement = document.getElementById('turn');
   private inputManager: InputManager;
   private boardMatrix: any[] = [[3,1,1,0],
                                 [0,2,1,0],
@@ -25,6 +26,8 @@ export default class GameManager {
     this.coins.push(coin2);
 
     this.board = board;
+
+    this.turnElement.innerHTML = `Turn: Player ${this.players[0].myTurn?'1' : '2'}`
 
     this.inputManager = new InputManager(this);
   }
@@ -48,6 +51,8 @@ export default class GameManager {
   private switchTurns(): void {
     this.players[0].myTurn = !this.players[0].myTurn;
     this.players[1].myTurn = !this.players[1].myTurn;
+
+    this.turnElement.innerHTML = `Turn: Player ${this.players[0].myTurn?'1' : '2'}`
   }
 
   private validMove(): boolean {
