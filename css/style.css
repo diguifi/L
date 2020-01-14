@@ -30,7 +30,7 @@ body {
 }
 
 .wrapper > * {
-  padding: 10px;
+  padding: 30px;
   flex: 1 100%;
 }
 
@@ -50,6 +50,14 @@ body {
 .main {
   align-self: center;
   width: 100%;
+}
+
+.main-footer {
+  align-self: center;
+  width: 100%;
+  opacity: 0;
+  margin-top: 15px;
+  margin-bottom: -50px;
 }
 
 .aside-1 {
@@ -77,6 +85,23 @@ body {
 
 .btn:hover {
   background: #3498db;
+}
+
+.fade-out {
+  animation: fadeOut ease 2s;
+  -webkit-animation: fadeOut ease 2s;
+  -moz-animation: fadeOut ease 2s;
+  -o-animation: fadeOut ease 2s;
+  -ms-animation: fadeOut ease 2s;
+}
+
+@keyframes fadeOut {
+  0% {
+    opacity:1;
+  }
+  100% {
+    opacity:0;
+  }
 }
 
 @media all and (min-width: 600px) {

@@ -3,6 +3,11 @@ import Coin from '../objects/coin';
 import InputManager from './inputManager';
 import Board from '../objects/board';
 
+enum errorCodes {
+  outOfBoard = 9,
+  samePositionAsBefore = 8,
+}
+
 export default class GameManager {
   public players: Player[] = [];
   public coinRound: boolean = false;
@@ -10,6 +15,9 @@ export default class GameManager {
   public coins: Coin[] = [];
   private board: Board;
   private turnElement: HTMLElement = document.getElementById('turn');
+  private errorsElement: HTMLElement = document.getElementById('errors');
+  private errorMessage: string = '';
+  private showingError: boolean = false;
   private inputManager: InputManager;
   private boardMatrix: any[] = [[3,1,1,0],
                                 [0,2,1,0],
@@ -62,14 +70,22 @@ export default class GameManager {
       if (!this.coinRound) {
         this.players.forEach(player => {
           if (player.myTurn) {
-            if (player.matrixPosition[0][0] === 9)
+            if (player.matrixPosition[0][0] === errorCodes.outOfBoard) {
               valid = false;
+              this.errorMessage = 'Player out of the board!';
+            }
+            else if (player.matrixPosition[0][0] === errorCodes.samePositionAsBefore) {
+              valid = false;
+              this.errorMessage = 'You must move your piece!';
+            }
             else {
               for (let i = 0; i < this.boardMatrix.length; i++) {
                 for (let j = 0; j < this.boardMatrix[0].length; j++) {
                   if (player.matrixPosition[i][j] === player.playerNumber) {
-                    if (this.boardMatrix[i][j] !== 0 && this.boardMatrix[i][j] !== player.playerNumber)
-                      valid = false;
+                    if (this.boardMatrix[i][j] !== 0 && this.boardMatrix[i][j] !== player.playerNumber) {
+                      valid = false; /* overlapping */
+                      this.errorMessage = 'Invalid move!';
+                    }
                   }
                 }
               }
@@ -79,14 +95,18 @@ export default class GameManager {
       } else {
         this.coins.forEach(coin => {
           if (coin.active) {
-            if (coin.matrixPosition[0][0] === 9)
+            if (coin.matrixPosition[0][0] === errorCodes.outOfBoard) {
               valid = false;
+              this.errorMessage = 'Coin is out of the board!';
+            }
             else {
               for (let i = 0; i < this.boardMatrix.length; i++) {
                 for (let j = 0; j < this.boardMatrix[0].length; j++) {
                   if (coin.matrixPosition[i][j] === coin.coinNumber) {
-                    if (this.boardMatrix[i][j] !== 0 && this.boardMatrix[i][j] !== coin.coinNumber)
+                    if (this.boardMatrix[i][j] !== 0 && this.boardMatrix[i][j] !== coin.coinNumber) {
                       valid = false;
+                      this.errorMessage = 'Invalid move!';
+                    }
                   }
                 }
               }
@@ -95,6 +115,13 @@ export default class GameManager {
         });
       }
       console.log('valid move: ' + valid);
+    }
+
+    if (valid) {
+      this.errorMessage = '';
+    }
+    else {
+      this.showError();
     }
 
     return valid;
@@ -146,6 +173,22 @@ export default class GameManager {
         console.log('placed coin');
       }
       console.log(this.boardMatrix);
+    }
+  }
+
+  private showError(): void {
+    this.errorsElement.innerHTML = this.errorMessage;
+    
+    if (!this.showingError) {
+      this.showingError = true;
+      this.errorsElement.style.opacity = '1';
+      this.errorsElement.classList.add('fade-out');
+
+      setTimeout(() => {
+        this.showingError = false;
+        this.errorsElement.classList.remove('fade-out');
+        this.errorsElement.style.opacity = '0';
+      }, 2000);
     }
   }
 

@@ -12,6 +12,7 @@ export default class Player {
   public myTurn: boolean = false;
   public playerNumber: number = 0;
   public matrixPosition: any[] = [];
+  public previousMatrixPosition: any[] = [];
 
   constructor(params: PlayerParams) {
     this.context = params.context;
@@ -156,7 +157,44 @@ export default class Player {
       }
     }
 
+    if (this.previousMatrixPosition.length === 0) {
+      this.previousMatrixPosition = matrix.splice(0);
+    } else {
+      if (!this.myTurn) {
+        this.previousMatrixPosition = matrix.splice(0);
+      }
+    }
+
+    if (this.matrixEqual(this.previousMatrixPosition, matrix)) {
+      matrix[0][0] = 8;
+    }
+
     return matrix;
+  }
+
+  private matrixEqual(a: any[], b: any[]): boolean {
+    if (a === b) return true;
+    if (a == null || b == null) return false;
+    if (a.length != b.length) return false;
+
+    let test = true;
+    for (var i = 0; i < a.length; ++i) {
+      test = this.arraysEqual(a[i], b[i]);
+
+      if (!test) return false;
+    }
+    return true;
+  }
+
+  private arraysEqual(a: any[], b: any[]): boolean {
+    if (a === b) return true;
+    if (a == null || b == null) return false;
+    if (a.length != b.length) return false;
+  
+    for (var i = 0; i < a.length; ++i) {
+      if (a[i] !== b[i]) return false;
+    }
+    return true;
   }
 
   public rotate(): void {
