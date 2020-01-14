@@ -190,22 +190,27 @@ function () {
     this.rotation = 0;
     this.inverted = false;
     this.myTurn = false;
+    this.playerNumber = 0;
+    this.matrixPosition = [];
     this.context = params.context;
     this.x = params.x;
     this.y = params.y;
     this.size = params.size;
     this.color = params.color;
     this.myTurn = params.myTurn;
+    this.playerNumber = params.playerNumber;
   }
 
   Player.prototype.update = function () {
     this.draw();
+    this.matrixPosition = this.calculatePositionOnMatrix();
   };
 
   Player.prototype.draw = function () {
+    this.context.beginPath();
+
     switch (this.rotation) {
       case 0:
-        this.context.beginPath();
         if (!this.inverted) this.context.rect(this.x, this.y, this.size, this.size);else this.context.rect(this.x + this.size * 2, this.y, this.size, this.size);
         this.context.rect(this.x + this.size, this.y, this.size, this.size);
         this.context.rect(this.x + this.size, this.y + this.size, this.size, this.size);
@@ -214,7 +219,6 @@ function () {
         break;
 
       case 1:
-        this.context.beginPath();
         if (!this.inverted) this.context.rect(this.x + this.size * 2, this.y, this.size, this.size);else this.context.rect(this.x + this.size * 2, this.y + this.size * 2, this.size, this.size);
         this.context.rect(this.x + this.size * 2, this.y + this.size, this.size, this.size);
         this.context.rect(this.x + this.size, this.y + this.size, this.size, this.size);
@@ -223,7 +227,6 @@ function () {
         break;
 
       case 2:
-        this.context.beginPath();
         if (!this.inverted) this.context.rect(this.x + this.size * 2, this.y + this.size * 2, this.size, this.size);else this.context.rect(this.x, this.y + this.size * 2, this.size, this.size);
         this.context.rect(this.x + this.size, this.y + this.size * 2, this.size, this.size);
         this.context.rect(this.x + this.size, this.y + this.size, this.size, this.size);
@@ -232,7 +235,6 @@ function () {
         break;
 
       case 3:
-        this.context.beginPath();
         if (!this.inverted) this.context.rect(this.x, this.y + this.size * 2, this.size, this.size);else this.context.rect(this.x, this.y, this.size, this.size);
         this.context.rect(this.x, this.y + this.size, this.size, this.size);
         this.context.rect(this.x + this.size, this.y + this.size, this.size, this.size);
@@ -243,6 +245,82 @@ function () {
 
     if (this.myTurn) this.context.fillStyle = this.color;else this.context.fillStyle = colorManager_1.darken(this.color, 10);
     this.context.fill();
+  };
+
+  Player.prototype.calculatePositionOnMatrix = function () {
+    var matrix = [[0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0]];
+    var squareNumber = 0;
+    var emptySpots = [];
+    var height = 3;
+    var width = 2;
+    var placementAdjusterX = 0;
+    var placementAdjusterY = 0;
+
+    switch (this.rotation) {
+      case 0:
+        height = 3;
+        width = 2;
+
+        if (!this.inverted) {
+          emptySpots = [3, 5];
+        } else {
+          emptySpots = [4, 6];
+          placementAdjusterX = this.size;
+        }
+
+        break;
+
+      case 1:
+        height = 2;
+        width = 3;
+
+        if (!this.inverted) {
+          emptySpots = [1, 2];
+        } else {
+          emptySpots = [4, 5];
+          placementAdjusterY = this.size;
+        }
+
+        break;
+
+      case 2:
+        height = 3;
+        width = 2;
+
+        if (!this.inverted) {
+          emptySpots = [2, 4];
+          placementAdjusterX = this.size;
+        } else {
+          emptySpots = [1, 3];
+        }
+
+        break;
+
+      case 3:
+        height = 2;
+        width = 3;
+
+        if (!this.inverted) {
+          emptySpots = [5, 6];
+          placementAdjusterY = this.size;
+        } else {
+          emptySpots = [2, 3];
+        }
+
+        break;
+    }
+
+    for (var i = (this.y + placementAdjusterY) / this.size; i < (this.y + placementAdjusterY) / this.size + height; i++) {
+      for (var j = (this.x + placementAdjusterX) / this.size; j < (this.x + placementAdjusterX) / this.size + width; j++) {
+        squareNumber++;
+
+        if (squareNumber != emptySpots[0] && squareNumber != emptySpots[1]) {
+          if (i >= 0 && i < matrix.length && j >= 0 && j < matrix[0].length) matrix[i][j] = this.playerNumber;else matrix[0][0] = 9;
+        }
+      }
+    }
+
+    return matrix;
   };
 
   Player.prototype.rotate = function () {
@@ -288,15 +366,19 @@ function () {
   function Coin(params) {
     this.selected = false;
     this.active = false;
+    this.coinNumber = 0;
+    this.matrixPosition = [];
     this.context = params.context;
     this.x = params.x;
     this.y = params.y;
     this.size = params.size;
     this.color = params.color;
+    this.coinNumber = params.coinNumber;
   }
 
   Coin.prototype.update = function () {
     this.draw();
+    this.matrixPosition = this.calculatePositionOnMatrix();
   };
 
   Coin.prototype.draw = function () {
@@ -305,6 +387,14 @@ function () {
     this.context.closePath();
     if (this.active) this.context.fillStyle = this.color;else this.context.fillStyle = colorManager_1.darken(this.color, 10);
     this.context.fill();
+  };
+
+  Coin.prototype.calculatePositionOnMatrix = function () {
+    var matrix = [[0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0]];
+    var y = this.y / this.size;
+    var x = this.x / this.size;
+    if (y >= 0 && y < matrix.length && x >= 0 && x < matrix[0].length) matrix[y][x] = this.coinNumber;else matrix[0][0] = 9;
+    return matrix;
   };
 
   Coin.prototype.moveRight = function () {
@@ -463,6 +553,7 @@ function () {
     this.coinRound = false;
     this.selectingCoin = false;
     this.coins = [];
+    this.boardMatrix = [[3, 1, 1, 0], [0, 2, 1, 0], [0, 2, 1, 0], [0, 2, 2, 4]];
     this.players.push(player1);
     this.players.push(player2);
     this.coins.push(coin1);
@@ -492,16 +583,116 @@ function () {
     this.players[1].myTurn = !this.players[1].myTurn;
   };
 
-  GameManager.prototype.changeGameState = function () {
-    if (!this.coinRound) {
-      if (!this.selectingCoin) {
-        this.activateCoinSelection();
+  GameManager.prototype.validMove = function () {
+    var _this = this;
+
+    var valid = true;
+
+    if (!this.selectingCoin) {
+      if (!this.coinRound) {
+        this.players.forEach(function (player) {
+          if (player.myTurn) {
+            if (player.matrixPosition[0][0] === 9) valid = false;else {
+              for (var i = 0; i < _this.boardMatrix.length; i++) {
+                for (var j = 0; j < _this.boardMatrix[0].length; j++) {
+                  if (player.matrixPosition[i][j] === player.playerNumber) {
+                    if (_this.boardMatrix[i][j] !== 0 && _this.boardMatrix[i][j] !== player.playerNumber) valid = false;
+                  }
+                }
+              }
+            }
+          }
+        });
       } else {
-        this.activateCoinRound();
+        this.coins.forEach(function (coin) {
+          if (coin.active) {
+            if (coin.matrixPosition[0][0] === 9) valid = false;else {
+              for (var i = 0; i < _this.boardMatrix.length; i++) {
+                for (var j = 0; j < _this.boardMatrix[0].length; j++) {
+                  if (coin.matrixPosition[i][j] === coin.coinNumber) {
+                    if (_this.boardMatrix[i][j] !== 0 && _this.boardMatrix[i][j] !== coin.coinNumber) valid = false;
+                  }
+                }
+              }
+            }
+          }
+        });
       }
-    } else {
-      this.finishCoinRound();
-      this.switchTurns();
+
+      console.log('valid move: ' + valid);
+    }
+
+    return valid;
+  };
+
+  GameManager.prototype.updateBoardMatrix = function () {
+    var _this = this;
+
+    if (!this.selectingCoin) {
+      if (!this.coinRound) {
+        this.players.forEach(function (player) {
+          if (player.myTurn) {
+            for (var i = 0; i < _this.boardMatrix.length; i++) {
+              for (var j = 0; j < _this.boardMatrix[0].length; j++) {
+                if (_this.boardMatrix[i][j] === player.playerNumber) {
+                  _this.boardMatrix[i][j] = 0;
+                }
+              }
+            }
+
+            for (var i = 0; i < _this.boardMatrix.length; i++) {
+              for (var j = 0; j < _this.boardMatrix[0].length; j++) {
+                if (player.matrixPosition[i][j] === player.playerNumber) {
+                  _this.boardMatrix[i][j] = player.playerNumber;
+                }
+              }
+            }
+          }
+        });
+        console.log('placed player');
+      } else {
+        this.coins.forEach(function (coin) {
+          if (coin.active) {
+            for (var i = 0; i < _this.boardMatrix.length; i++) {
+              for (var j = 0; j < _this.boardMatrix[0].length; j++) {
+                if (_this.boardMatrix[i][j] === coin.coinNumber) {
+                  _this.boardMatrix[i][j] = 0;
+                }
+              }
+            }
+
+            for (var i = 0; i < _this.boardMatrix.length; i++) {
+              for (var j = 0; j < _this.boardMatrix[0].length; j++) {
+                if (coin.matrixPosition[i][j] === coin.coinNumber) {
+                  _this.boardMatrix[i][j] = coin.coinNumber;
+                }
+              }
+            }
+          }
+        });
+        console.log('placed coin');
+      }
+
+      console.log(this.boardMatrix);
+    }
+  };
+
+  GameManager.prototype.update = function () {};
+
+  GameManager.prototype.changeGameState = function () {
+    if (this.validMove()) {
+      this.updateBoardMatrix();
+
+      if (!this.coinRound) {
+        if (!this.selectingCoin) {
+          this.activateCoinSelection();
+        } else {
+          this.activateCoinRound();
+        }
+      } else {
+        this.finishCoinRound();
+        this.switchTurns();
+      }
     }
   };
 
@@ -586,7 +777,8 @@ function (_super) {
       y: 0,
       size: _this.slotSize,
       color: '#3498db',
-      myTurn: true
+      myTurn: true,
+      playerNumber: 1
     });
     _this.player2 = new player_1.default({
       context: _this.context,
@@ -594,7 +786,8 @@ function (_super) {
       y: _this.slotSize,
       size: _this.slotSize,
       color: '#e74c3c',
-      myTurn: false
+      myTurn: false,
+      playerNumber: 2
     });
 
     _this.player2.rotate();
@@ -608,14 +801,16 @@ function (_super) {
       x: 0,
       y: 0,
       size: _this.slotSize,
-      color: '#f1c40f'
+      color: '#f1c40f',
+      coinNumber: 3
     });
     _this.coin2 = new coin_1.default({
       context: _this.context,
       x: _this.slotSize * 3,
       y: _this.slotSize * 3,
       size: _this.slotSize,
-      color: '#f1c40f'
+      color: '#f1c40f',
+      coinNumber: 4
     });
     _this.gameManager = new gameManager_1.default(_this.player1, _this.player2, _this.coin1, _this.coin2, _this.board);
     return _this;
@@ -713,7 +908,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "63129" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "60158" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

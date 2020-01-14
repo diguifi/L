@@ -25,6 +25,7 @@ export default class Player {
 
   public update(): void {
     this.draw();
+    this.matrixPosition = this.calculatePositionOnMatrix();
   }
 
   private draw(): void {
@@ -77,8 +78,6 @@ export default class Player {
     else
       this.context.fillStyle = darken(this.color, 10);
     this.context.fill();
-
-    this.matrixPosition = this.calculatePositionOnMatrix();
   }
 
   private calculatePositionOnMatrix(): any[] {

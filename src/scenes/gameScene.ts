@@ -57,6 +57,7 @@ export default class GameScene extends Scene {
       y: 0,
       size: this.slotSize,
       color: '#f1c40f',
+      coinNumber: 3,
     });
 
     this.coin2 = new Coin(<CoinParams>{
@@ -65,6 +66,7 @@ export default class GameScene extends Scene {
       y: this.slotSize * 3,
       size: this.slotSize,
       color: '#f1c40f',
+      coinNumber: 4,
     });
 
     this.gameManager = new GameManager(this.player1, this.player2, this.coin1, this.coin2, this.board);

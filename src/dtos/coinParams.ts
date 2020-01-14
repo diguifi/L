@@ -4,4 +4,5 @@ export default interface CoinParams{
   y: number;
   size: number;
   color: string;
+  coinNumber: number;
 }

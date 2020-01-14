@@ -53,48 +53,93 @@ export default class GameManager {
   private validMove(): boolean {
     let valid = true;
 
-    this.players.forEach(player => {
-      if (player.myTurn) {
-        if (player.matrixPosition[0][0] === 9)
-          valid = false;
-        else {
-          for (let i = 0; i < this.boardMatrix.length; i++) {
-            for (let j = 0; j < this.boardMatrix[0].length; j++) {
-              if (player.matrixPosition[i][j] === player.playerNumber) {
-                if (this.boardMatrix[i][j] !== 0 && this.boardMatrix[i][j] !== player.playerNumber)
-                  valid = false;
+    if (!this.selectingCoin) {
+      if (!this.coinRound) {
+        this.players.forEach(player => {
+          if (player.myTurn) {
+            if (player.matrixPosition[0][0] === 9)
+              valid = false;
+            else {
+              for (let i = 0; i < this.boardMatrix.length; i++) {
+                for (let j = 0; j < this.boardMatrix[0].length; j++) {
+                  if (player.matrixPosition[i][j] === player.playerNumber) {
+                    if (this.boardMatrix[i][j] !== 0 && this.boardMatrix[i][j] !== player.playerNumber)
+                      valid = false;
+                  }
+                }
               }
             }
           }
-        }
+        });
+      } else {
+        this.coins.forEach(coin => {
+          if (coin.active) {
+            if (coin.matrixPosition[0][0] === 9)
+              valid = false;
+            else {
+              for (let i = 0; i < this.boardMatrix.length; i++) {
+                for (let j = 0; j < this.boardMatrix[0].length; j++) {
+                  if (coin.matrixPosition[i][j] === coin.coinNumber) {
+                    if (this.boardMatrix[i][j] !== 0 && this.boardMatrix[i][j] !== coin.coinNumber)
+                      valid = false;
+                  }
+                }
+              }
+            }
+          }
+        });
       }
-    });
+      console.log('valid move: ' + valid);
+    }
 
     return valid;
   }
 
   private updateBoardMatrix(): void {
-    if (!this.coinRound && !this.selectingCoin) {
-      this.players.forEach(player => {
-        if (player.myTurn) {
-          for (let i = 0; i < this.boardMatrix.length; i++) {
-            for (let j = 0; j < this.boardMatrix[0].length; j++) {
-              if (this.boardMatrix[i][j] === player.playerNumber) {
-                this.boardMatrix[i][j] = 0;
+    if (!this.selectingCoin) {
+      if (!this.coinRound) {
+        this.players.forEach(player => {
+          if (player.myTurn) {
+            for (let i = 0; i < this.boardMatrix.length; i++) {
+              for (let j = 0; j < this.boardMatrix[0].length; j++) {
+                if (this.boardMatrix[i][j] === player.playerNumber) {
+                  this.boardMatrix[i][j] = 0;
+                }
+              }
+            }
+      
+            for (let i = 0; i < this.boardMatrix.length; i++) {
+              for (let j = 0; j < this.boardMatrix[0].length; j++) {
+                if (player.matrixPosition[i][j] === player.playerNumber) {
+                  this.boardMatrix[i][j] = player.playerNumber;
+                }
               }
             }
           }
-    
-          for (let i = 0; i < this.boardMatrix.length; i++) {
-            for (let j = 0; j < this.boardMatrix[0].length; j++) {
-              if (player.matrixPosition[i][j] === player.playerNumber) {
-                this.boardMatrix[i][j] = player.playerNumber;
+        });
+        console.log('placed player');
+      } else {
+        this.coins.forEach(coin => {
+          if (coin.active) {
+            for (let i = 0; i < this.boardMatrix.length; i++) {
+              for (let j = 0; j < this.boardMatrix[0].length; j++) {
+                if (this.boardMatrix[i][j] === coin.coinNumber) {
+                  this.boardMatrix[i][j] = 0;
+                }
+              }
+            }
+      
+            for (let i = 0; i < this.boardMatrix.length; i++) {
+              for (let j = 0; j < this.boardMatrix[0].length; j++) {
+                if (coin.matrixPosition[i][j] === coin.coinNumber) {
+                  this.boardMatrix[i][j] = coin.coinNumber;
+                }
               }
             }
           }
-        }
-      });
-
+        });
+        console.log('placed coin');
+      }
       console.log(this.boardMatrix);
     }
   }

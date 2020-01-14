@@ -9,6 +9,8 @@ export default class Coin {
   public color: string;
   public selected: boolean = false;
   public active: boolean = false;
+  public coinNumber: number = 0;
+  public matrixPosition: any[] = [];
 
   constructor(params: CoinParams) {
     this.context = params.context;
@@ -16,10 +18,12 @@ export default class Coin {
     this.y = params.y;
     this.size = params.size;
     this.color = params.color;
+    this.coinNumber = params.coinNumber;
   }
 
   public update(): void {
     this.draw();
+    this.matrixPosition = this.calculatePositionOnMatrix();
   }
 
   private draw(): void {
@@ -32,6 +36,23 @@ export default class Coin {
     else
       this.context.fillStyle = darken(this.color, 10);
     this.context.fill();
+  }
+
+  private calculatePositionOnMatrix(): any[] {
+    let matrix = [[0,0,0,0],
+                  [0,0,0,0],
+                  [0,0,0,0],
+                  [0,0,0,0],];
+      
+    let y = this.y/this.size;
+    let x = this.x/this.size;
+
+    if ((y >= 0 && y < matrix.length) && (x >= 0 && x < matrix[0].length))
+      matrix[y][x] = this.coinNumber;
+    else
+      matrix[0][0] = 9;
+
+    return matrix;
   }
 
   public moveRight(): void {
