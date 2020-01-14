@@ -50,16 +50,73 @@ export default class GameManager {
     this.players[1].myTurn = !this.players[1].myTurn;
   }
 
-  public changeGameState(): void {
-    if (!this.coinRound) {
-      if (!this.selectingCoin) {
-        this.activateCoinSelection();
-      } else {
-        this.activateCoinRound();
+  private validMove(): boolean {
+    let valid = true;
+
+    this.players.forEach(player => {
+      if (player.myTurn) {
+        if (player.matrixPosition[0][0] === 9)
+          valid = false;
+        else {
+          for (let i = 0; i < this.boardMatrix.length; i++) {
+            for (let j = 0; j < this.boardMatrix[0].length; j++) {
+              if (player.matrixPosition[i][j] === player.playerNumber) {
+                if (this.boardMatrix[i][j] !== 0 && this.boardMatrix[i][j] !== player.playerNumber)
+                  valid = false;
+              }
+            }
+          }
+        }
       }
-    } else {
-      this.finishCoinRound();
-      this.switchTurns();
+    });
+
+    return valid;
+  }
+
+  private updateBoardMatrix(): void {
+    if (!this.coinRound && !this.selectingCoin) {
+      this.players.forEach(player => {
+        if (player.myTurn) {
+          for (let i = 0; i < this.boardMatrix.length; i++) {
+            for (let j = 0; j < this.boardMatrix[0].length; j++) {
+              if (this.boardMatrix[i][j] === player.playerNumber) {
+                this.boardMatrix[i][j] = 0;
+              }
+            }
+          }
+    
+          for (let i = 0; i < this.boardMatrix.length; i++) {
+            for (let j = 0; j < this.boardMatrix[0].length; j++) {
+              if (player.matrixPosition[i][j] === player.playerNumber) {
+                this.boardMatrix[i][j] = player.playerNumber;
+              }
+            }
+          }
+        }
+      });
+
+      console.log(this.boardMatrix);
+    }
+  }
+
+  public update(): void {
+    
+  }
+
+  public changeGameState(): void {
+    if (this.validMove()) {
+      this.updateBoardMatrix();
+
+      if (!this.coinRound) {
+        if (!this.selectingCoin) {
+          this.activateCoinSelection();
+        } else {
+          this.activateCoinRound();
+        }
+      } else {
+        this.finishCoinRound();
+        this.switchTurns();
+      }
     }
   }
 

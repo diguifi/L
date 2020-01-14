@@ -11,6 +11,7 @@ export default class Player {
   public color: string;
   public myTurn: boolean = false;
   public playerNumber: number = 0;
+  public matrixPosition: any[] = [];
 
   constructor(params: PlayerParams) {
     this.context = params.context;
@@ -77,8 +78,7 @@ export default class Player {
       this.context.fillStyle = darken(this.color, 10);
     this.context.fill();
 
-    if (this.myTurn)
-      console.log(this.calculatePositionOnMatrix());
+    this.matrixPosition = this.calculatePositionOnMatrix();
   }
 
   private calculatePositionOnMatrix(): any[] {
