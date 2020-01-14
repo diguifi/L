@@ -1,6 +1,20 @@
 <html>
-<body>
-  <canvas id="gameCanvas" width="490" height="490"></canvas>
-  <script src="./src/index.ts"></script>
-</body>
+  <head>
+    <title>L</title>
+  </head>
+  <body>
+    <div class="wrapper fullscreen">
+      <header class="header">The hardest easy game</header>
+      <div class="main">
+        <canvas id="gameCanvas" width="360" height="360"></canvas> 
+      </div>
+      <aside class="aside aside-1" id="timer">00:10</aside>
+      <aside class="aside aside-2" id="turn">Turn: Player 1</aside>
+      <footer class="footer">
+        <input class="return" type="submit" value="Exit">
+      </footer>
+    </div>
+    <script src="./src/index.ts"></script>
+    <link rel="stylesheet" type="text/css" href="./css/style.css">
+  </body>
 </html>

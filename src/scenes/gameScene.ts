@@ -14,7 +14,7 @@ export default class GameScene extends Scene {
   private player2: Player;
   private coin1: Coin;
   private coin2: Coin;
-  private slotSize: number = 50;
+  private slotSize: number = 90;
   private gameManager: GameManager;
 
   constructor(params: SceneParams) {
@@ -25,7 +25,7 @@ export default class GameScene extends Scene {
       x: 0,
       y: 0,
       size: this.slotSize,
-      color: '#7f8c8d',
+      color: '#bdc3c7',
     });
 
     this.player1 = new Player(<PlayerParams>{
