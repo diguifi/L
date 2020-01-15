@@ -9,5 +9,6 @@ export default class Scene {
     this.active = active;
   }
 
-  public update(): void{  }
+  public update(): void{ /* call all update functions that need to be triggered every frame */ }
+  public destroy(): void{ /* deactivate any parallel processes and set all properties to null */ }
 }

@@ -15,10 +15,14 @@ export default class GameScene extends Scene {
   private coin1: Coin;
   private coin2: Coin;
   private slotSize: number = 90;
+  private maxTime: number = 20;
   private gameManager: GameManager;
+  private destroyed: boolean = false;
 
   constructor(params: SceneParams) {
     super(params.context, params.name, params.active);
+
+    this.maxTime = 20;
 
     this.board = new Board(<BoardParams>{
       context: this.context,
@@ -69,14 +73,30 @@ export default class GameScene extends Scene {
       coinNumber: 4,
     });
 
-    this.gameManager = new GameManager(this.player1, this.player2, this.coin1, this.coin2, this.board);
+    this.gameManager = new GameManager(this.player1, this.player2, this.coin1, this.coin2, this.board, this.maxTime);
   }
 
   public update(): void {
-    this.board.update();
-    this.player1.update();
-    this.player2.update();
-    this.coin1.update();
-    this.coin2.update();
+    if (!this.destroyed) {
+      this.board.update();
+      this.player1.update();
+      this.player2.update();
+      this.coin1.update();
+      this.coin2.update();
+    }
+  }
+
+  public destroy(): void{
+    this.destroyed = true; 
+    this.gameManager.destroy();
+    this.gameManager = null;
+    this.board = null;
+    this.player1 = null;
+    this.player2 = null;
+    this.coin1 = null;
+    this.coin2 = null;
+    this.slotSize = null;
+    this.destroyed = null;
+    this.maxTime = null;
   }
 }

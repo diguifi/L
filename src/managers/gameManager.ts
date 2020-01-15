@@ -16,7 +16,11 @@ export default class GameManager {
   private board: Board;
   private turnElement: HTMLElement = document.getElementById('turn');
   private errorsElement: HTMLElement = document.getElementById('errors');
+  private timerElement: HTMLElement = document.getElementById('timer');
   private errorMessage: string = '';
+  private maxTime: number = 20;
+  private timeLeft: number = 20;
+  private countdownTimer: number;
   private showingError: boolean = false;
   private inputManager: InputManager;
   private boardMatrix: any[] = [[3,1,1,0],
@@ -26,7 +30,10 @@ export default class GameManager {
 
   constructor (player1: Player, player2: Player,
     coin1: Coin, coin2: Coin,
-    board: Board) {
+    board: Board, maxTime: number) {
+    this.maxTime = maxTime;
+    this.timerElement.innerHTML = `${this.maxTime}`;
+
     this.players.push(player1);
     this.players.push(player2);
 
@@ -38,6 +45,8 @@ export default class GameManager {
     this.turnElement.innerHTML = `Turn: Player ${this.players[0].myTurn?'1' : '2'}`
 
     this.inputManager = new InputManager(this);
+
+    this.timerController();
   }
 
   private activateCoinSelection(): void {
@@ -176,6 +185,22 @@ export default class GameManager {
     }
   }
 
+  private timerController(): void {
+    this.countdownTimer = setInterval(() => {
+      this.timerElement.innerHTML = `${this.timeLeft}`;
+      this.timeLeft -= 1;
+      if(this.timeLeft < 0){
+        clearInterval(this.countdownTimer);
+        this.resetTimer();
+      }
+    }, 1000);
+  }
+
+  private resetTimer(): void {
+    this.timeLeft = this.maxTime;
+    this.timerController();
+  }
+
   private showError(): void {
     this.errorsElement.innerHTML = this.errorMessage;
     
@@ -192,8 +217,29 @@ export default class GameManager {
     }
   }
 
-  public update(): void {
-    
+  public deleteTimer(): void {
+    this.timerElement.innerHTML = `${this.maxTime}`;
+    clearInterval(this.countdownTimer);
+  }
+
+  public destroy(): void {
+    this.deleteTimer();
+    this.players = null;
+    this.coinRound = null;
+    this.selectingCoin = null;
+    this.coins = null;
+    this.board = null;
+    this.turnElement = null;
+    this.errorsElement = null;
+    this.timerElement = null;
+    this.errorMessage = null;
+    this.maxTime = null;
+    this.timeLeft = null;
+    this.countdownTimer = null;
+    this.showingError = null;
+    this.inputManager.destroy();
+    this.inputManager = null;
+    this.boardMatrix = null;
   }
 
   public changeGameState(): void {
