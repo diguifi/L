@@ -18,8 +18,8 @@ export default class GameManager {
   private errorsElement: HTMLElement = document.getElementById('errors');
   private timerElement: HTMLElement = document.getElementById('timer');
   private errorMessage: string = '';
-  private maxTime: number = 20;
-  private timeLeft: number = 20;
+  private maxTime: number;
+  private timeLeft: number;
   private countdownTimer: number;
   private showingError: boolean = false;
   private inputManager: InputManager;
@@ -32,6 +32,7 @@ export default class GameManager {
     coin1: Coin, coin2: Coin,
     board: Board, maxTime: number) {
     this.maxTime = maxTime;
+    this.timeLeft = maxTime;
     this.timerElement.innerHTML = `${this.maxTime}`;
 
     this.players.push(player1);
@@ -42,7 +43,7 @@ export default class GameManager {
 
     this.board = board;
 
-    this.turnElement.innerHTML = `Turn: Player ${this.players[0].myTurn?'1' : '2'}`
+    this.turnElement.innerHTML = `Turn: Player ${this.players[0].myTurn?'1' : '2'}`;
 
     this.inputManager = new InputManager(this);
 
@@ -66,10 +67,11 @@ export default class GameManager {
   }
 
   private switchTurns(): void {
+    this.resetTimer();
     this.players[0].myTurn = !this.players[0].myTurn;
     this.players[1].myTurn = !this.players[1].myTurn;
 
-    this.turnElement.innerHTML = `Turn: Player ${this.players[0].myTurn?'1' : '2'}`
+    this.turnElement.innerHTML = `Turn: Player ${this.players[0].myTurn?'1' : '2'}`;
   }
 
   private validMove(): boolean {
@@ -185,22 +187,6 @@ export default class GameManager {
     }
   }
 
-  private timerController(): void {
-    this.countdownTimer = setInterval(() => {
-      this.timerElement.innerHTML = `${this.timeLeft}`;
-      this.timeLeft -= 1;
-      if(this.timeLeft < 0){
-        clearInterval(this.countdownTimer);
-        this.resetTimer();
-      }
-    }, 1000);
-  }
-
-  private resetTimer(): void {
-    this.timeLeft = this.maxTime;
-    this.timerController();
-  }
-
   private showError(): void {
     this.errorsElement.innerHTML = this.errorMessage;
     
@@ -217,29 +203,31 @@ export default class GameManager {
     }
   }
 
+  private timerController(): void {
+    this.countdownTimer = setInterval(() => {
+      this.timerElement.innerHTML = `${this.timeLeft}`;
+      this.timeLeft -= 1;
+      if(this.timeLeft < 0){
+        this.gameOverNoTime();
+      }
+    }, 1000);
+  }
+
+  private gameOverNoTime(): void {
+    clearInterval(this.countdownTimer);
+    this.turnElement.innerHTML = `WINNER: Player ${this.players[0].myTurn?'2' : '1'}`;
+    this.inputManager.setGameOver();
+  }
+
+  private resetTimer(): void {
+    clearInterval(this.countdownTimer);
+    this.timeLeft = this.maxTime;
+    this.timerController();
+  }
+
   public deleteTimer(): void {
     this.timerElement.innerHTML = `${this.maxTime}`;
     clearInterval(this.countdownTimer);
-  }
-
-  public destroy(): void {
-    this.deleteTimer();
-    this.players = null;
-    this.coinRound = null;
-    this.selectingCoin = null;
-    this.coins = null;
-    this.board = null;
-    this.turnElement = null;
-    this.errorsElement = null;
-    this.timerElement = null;
-    this.errorMessage = null;
-    this.maxTime = null;
-    this.timeLeft = null;
-    this.countdownTimer = null;
-    this.showingError = null;
-    this.inputManager.destroy();
-    this.inputManager = null;
-    this.boardMatrix = null;
   }
 
   public changeGameState(): void {
@@ -263,5 +251,25 @@ export default class GameManager {
     this.coins.forEach(coin => {
       coin.active = !coin.active;
     });
+  }
+
+  public destroy(): void {
+    this.deleteTimer();
+    this.players = null;
+    this.coinRound = null;
+    this.selectingCoin = null;
+    this.coins = null;
+    this.board = null;
+    this.turnElement = null;
+    this.errorsElement = null;
+    this.timerElement = null;
+    this.errorMessage = null;
+    this.maxTime = null;
+    this.timeLeft = null;
+    this.countdownTimer = null;
+    this.showingError = null;
+    this.inputManager.destroy();
+    this.inputManager = null;
+    this.boardMatrix = null;
   }
 }

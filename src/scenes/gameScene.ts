@@ -15,14 +15,12 @@ export default class GameScene extends Scene {
   private coin1: Coin;
   private coin2: Coin;
   private slotSize: number = 90;
-  private maxTime: number = 20;
+  private maxTime: number = 25;
   private gameManager: GameManager;
   private destroyed: boolean = false;
 
   constructor(params: SceneParams) {
     super(params.context, params.name, params.active);
-
-    this.maxTime = 20;
 
     this.board = new Board(<BoardParams>{
       context: this.context,
@@ -37,7 +35,7 @@ export default class GameScene extends Scene {
       x: this.slotSize,
       y: 0,
       size: this.slotSize,
-      color: '#3498db',
+      color: '#2ecc71',
       myTurn: true,
       playerNumber: 1,
     });

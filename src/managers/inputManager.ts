@@ -5,6 +5,7 @@ export default class InputManager {
   private gameManager: GameManager;
   private switch: boolean = false;
   private destroyed: boolean = false;
+  private gameOver: boolean = false;
 
   constructor (gameManager: GameManager) {
     this.gameManager = gameManager;
@@ -13,7 +14,7 @@ export default class InputManager {
   }
 
   private checkInputs(e: any): any {
-    if (!this.destroyed) {
+    if (!this.destroyed && !this.gameOver) {
       e = e || window.event;
 
       if (!this.gameManager.selectingCoin && !this.gameManager.coinRound) {
@@ -85,5 +86,9 @@ export default class InputManager {
 
   public destroy(): void {
     this.destroyed = true;
+  }
+
+  public setGameOver(): void {
+    this.gameOver = true;
   }
 }
