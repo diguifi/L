@@ -2,6 +2,7 @@ import Player from '../objects/player';
 import Coin from '../objects/coin';
 import InputManager from './inputManager';
 import Board from '../objects/board';
+import ConnectionManager from './connectionManager';
 
 enum errorCodes {
   outOfBoard = 9,
@@ -9,6 +10,7 @@ enum errorCodes {
 }
 
 export default class GameManager {
+  public connectionManager: ConnectionManager;
   public players: Player[] = [];
   public coinRound: boolean = false;
   public selectingCoin: boolean = false;
@@ -20,7 +22,7 @@ export default class GameManager {
   private errorMessage: string = '';
   private maxTime: number;
   private timeLeft: number;
-  private countdownTimer: number;
+  private countdownTimer: any;
   private showingError: boolean = false;
   private inputManager: InputManager;
   private boardMatrix: any[] = [[3,1,1,0],
@@ -48,6 +50,7 @@ export default class GameManager {
     this.inputManager = new InputManager(this);
 
     this.timerController();
+    this.connectionManager = new ConnectionManager();
   }
 
   private activateCoinSelection(): void {
@@ -271,5 +274,7 @@ export default class GameManager {
     this.inputManager.destroy();
     this.inputManager = null;
     this.boardMatrix = null;
+    this.connectionManager.destroy();
+    this.connectionManager = null;
   }
 }
