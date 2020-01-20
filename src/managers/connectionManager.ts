@@ -5,11 +5,16 @@ export default class ConnectionManager {
   public gameGuid: string;
   public connected: boolean = false;
   public error: boolean = false;
+  public waitingPlayer: boolean = false;
   private path: string = '/game/';
 
   constructor () {
     this.initFirebaseConfigs();
     this.initRoom();
+  }
+
+  public initListeners(): void {
+    
   }
 
   private initFirebaseConfigs(): void {
@@ -67,7 +72,7 @@ export default class ConnectionManager {
       },
     });
     this.updateUrl();
-    this.connected = true;
+    this.waitingPlayer = true;
   }
 
   private getUrlGuid(): string {
