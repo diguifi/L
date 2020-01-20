@@ -7,6 +7,7 @@ import CoinParams from '../dtos/coinParams';
 import BoardParams from '../dtos/boardParams';
 import SceneParams from '../dtos/sceneParams';
 import GameManager from '../managers/gameManager';
+import ConnectionManager from '../managers/connectionManager';
 
 export default class GameScene extends Scene {
   private board: Board;
@@ -18,9 +19,12 @@ export default class GameScene extends Scene {
   private maxTime: number = 25;
   private gameManager: GameManager;
   private destroyed: boolean = false;
+  private connectionManager: ConnectionManager;
 
   constructor(params: SceneParams) {
-    super(params.context, params.name, params.active);
+    super(params.context, params.name, params.active, params.game);
+
+    this.connectionManager = params.connectionManager;
 
     this.board = new Board(<BoardParams>{
       context: this.context,
@@ -71,7 +75,7 @@ export default class GameScene extends Scene {
       coinNumber: 4,
     });
 
-    this.gameManager = new GameManager(this.player1, this.player2, this.coin1, this.coin2, this.board, this.maxTime);
+    this.gameManager = new GameManager(this.player1, this.player2, this.coin1, this.coin2, this.board, this.maxTime, this.connectionManager);
   }
 
   public update(): void {

@@ -4,6 +4,7 @@ export default class ConnectionManager {
   public firebaseDB: any;
   public gameGuid: string;
   public connected: boolean = false;
+  public error: boolean = false;
   private path: string = '/game/';
 
   constructor () {
@@ -49,7 +50,7 @@ export default class ConnectionManager {
       if (snapshot.exists()){
         this.connected = true;
        } else {
-        this.connected = false;
+        this.error = true;
        }
     });
   }

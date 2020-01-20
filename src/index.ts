@@ -1,8 +1,10 @@
 import Scene from './scenes/sceneBase';
 import GameScene from './scenes/gameScene';
 import SceneParams from './dtos/sceneParams';
+import LobbyScene from './scenes/lobbyScene';
+import ConnectionManager from './managers/connectionManager';
 
-class Game {
+export default class Game {
   private readonly context: CanvasRenderingContext2D;
   private canvas: HTMLCanvasElement;
   private playBtn: HTMLElement = document.getElementById('goToGame');
@@ -23,13 +25,29 @@ class Game {
 
     window.requestAnimationFrame(() => this.update());
   }
-
-  private addGameScene(): void {
-    this.scenes.push(new GameScene(<SceneParams>{context: this.context, name: 'game', active: true}));
+  private removeScenes() {
+    this.removeGameScene();
+    this.removeLobbyScene();
   }
-  private removeGameScene(): void {
+
+  public addGameScene(active: boolean, connectionManager: ConnectionManager): void {
+    this.scenes.push(new GameScene(<SceneParams>{context: this.context, name: 'game', active: active, game: this, connectionManager: connectionManager}));
+  }
+  public removeGameScene(): void {
     this.scenes.forEach((scene, index, object) => {
       if (scene.name === 'game') {
+        scene.destroy();
+        scene = null;
+        object.splice(index, 1);
+      }
+    });
+  }
+  public addLobbyScene(active: boolean): void {
+    this.scenes.push(new LobbyScene(<SceneParams>{context: this.context, name: 'lobby', active: active, game: this, connectionManager: null}));
+  }
+  public removeLobbyScene(): void {
+    this.scenes.forEach((scene, index, object) => {
+      if (scene.name === 'lobby') {
         scene.destroy();
         scene = null;
         object.splice(index, 1);
@@ -51,13 +69,13 @@ class Game {
   public goToGame(): void {
     document.getElementById('homePage').style.display = 'none';
     document.getElementById('gamePage').style.display = 'block';
-    this.addGameScene();
+    this.addLobbyScene(true);
   }
 
   public goToHome(): void {
     document.getElementById('gamePage').style.display = 'none';
     document.getElementById('homePage').style.display = 'block';
-    this.removeGameScene();
+    this.removeScenes();
   }
 }
 

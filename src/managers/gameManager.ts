@@ -10,7 +10,6 @@ enum errorCodes {
 }
 
 export default class GameManager {
-  public connectionManager: ConnectionManager;
   public players: Player[] = [];
   public coinRound: boolean = false;
   public selectingCoin: boolean = false;
@@ -25,6 +24,7 @@ export default class GameManager {
   private countdownTimer: any;
   private showingError: boolean = false;
   private inputManager: InputManager;
+  private connectionManager: ConnectionManager;
   private boardMatrix: any[] = [[3,1,1,0],
                                 [0,2,1,0],
                                 [0,2,1,0],
@@ -32,7 +32,8 @@ export default class GameManager {
 
   constructor (player1: Player, player2: Player,
     coin1: Coin, coin2: Coin,
-    board: Board, maxTime: number) {
+    board: Board, maxTime: number,
+    connectionManager: ConnectionManager) {
     this.maxTime = maxTime;
     this.timeLeft = maxTime;
     this.timerElement.innerHTML = `${this.maxTime}`;
@@ -49,8 +50,9 @@ export default class GameManager {
 
     this.inputManager = new InputManager(this);
 
+    this.connectionManager = connectionManager;
+
     this.timerController();
-    this.connectionManager = new ConnectionManager();
   }
 
   private activateCoinSelection(): void {
