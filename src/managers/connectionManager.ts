@@ -2,8 +2,8 @@ import * as firebase from 'firebase';
 
 export default class ConnectionManager {
   public firebaseDB: any;
-  public roomData: any;
   public gameGuid: string;
+  public connected: boolean = false;
   private path: string = '/game/';
 
   constructor () {
@@ -45,8 +45,13 @@ export default class ConnectionManager {
   private joinRoom(): void {
     this.gameGuid = this.getUrlGuid();
 
-    this.roomData = this.firebaseDB.ref(this.gameGuid);
-    console.log(this.roomData)
+    this.firebaseDB.ref(this.gameGuid).once('value', snapshot => {
+      if (snapshot.exists()){
+        this.connected = true;
+       } else {
+        this.connected = false;
+       }
+    });
   }
 
   private createRoom(): void {
@@ -61,6 +66,7 @@ export default class ConnectionManager {
       },
     });
     this.updateUrl();
+    this.connected = true;
   }
 
   private getUrlGuid(): string {
