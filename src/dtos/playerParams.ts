@@ -1,3 +1,5 @@
+import ConnectionManager from "../managers/connectionManager";
+
 export default interface PlayerParams{
   context: CanvasRenderingContext2D;
   x: number;
@@ -6,4 +8,5 @@ export default interface PlayerParams{
   color: string;
   myTurn: boolean;
   playerNumber: number;
+  connectionManager: ConnectionManager;
 }

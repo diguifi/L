@@ -1,10 +1,14 @@
 import PlayerParams from '../dtos/playerParams';
 import { darken } from '../managers/colorManager';
+import ConnectionManager from '../managers/connectionManager';
 
 export default class Player {
   private context: CanvasRenderingContext2D;
   private rotation: number = 0;
   private inverted: boolean = false;
+  private moved: boolean = false;
+  private firstTick: boolean = true;
+  public connectionManager: ConnectionManager;
   public x: number;
   public y: number;
   public size: number;
@@ -22,11 +26,34 @@ export default class Player {
     this.color = params.color;
     this.myTurn = params.myTurn;
     this.playerNumber = params.playerNumber;
+    this.connectionManager = params.connectionManager;
   }
 
   public update(): void {
     this.draw();
     this.matrixPosition = this.calculatePositionOnMatrix();
+
+    if (!this.connectionManager.myTurn) {
+
+      if (this.firstTick) {
+        this.firstTick = false;
+        this.uploadPlayerPosition();
+      }
+      else {
+        if (this.playerNumber == 2){
+          this.rotation = this.connectionManager.player2.rotation;
+          this.inverted = this.connectionManager.player2.inverted;
+          this.x = this.connectionManager.player2.x;
+          this.y = this.connectionManager.player2.y;
+        }
+        else {
+          this.rotation = this.connectionManager.player1.rotation;
+          this.inverted = this.connectionManager.player1.inverted;
+          this.x = this.connectionManager.player1.x;
+          this.y = this.connectionManager.player1.y;
+        }
+      }
+    }
   }
 
   private draw(): void {
@@ -211,29 +238,57 @@ export default class Player {
   }
 
   public rotate(): void {
-    if (this.rotation < 3)
+    if (this.rotation < 3){
       this.rotation++;
-    else
+    }
+    else {
       this.rotation = 0;
+    }
+
+    this.uploadPlayerPosition();
   }
 
   public invert(): void {
     this.inverted = !this.inverted;
+    this.uploadPlayerPosition();
   }
 
   public moveRight(): void {
     this.x += this.size;
+    this.uploadPlayerPosition();
   }
 
   public moveLeft(): void {
     this.x -= this.size;
+    this.uploadPlayerPosition();
   }
 
   public moveDown(): void {
     this.y += this.size;
+    this.uploadPlayerPosition();
   }
 
   public moveUp(): void {
     this.y -= this.size;
+    this.uploadPlayerPosition();
+  }
+
+  public uploadPlayerPosition(): void {
+    if (this.connectionManager.isHost && (this.playerNumber == 1)) {
+      this.connectionManager.firebaseDB.ref(this.connectionManager.gameGuid).child('room').child('player1').update({
+        rotation: this.rotation,
+        inverted: this.inverted,
+        x: this.x,
+        y: this.y,
+      });
+    }
+    else {
+      this.connectionManager.firebaseDB.ref(this.connectionManager.gameGuid).child('room').child('player2').update({
+        rotation: this.rotation,
+        inverted: this.inverted,
+        x: this.x,
+        y: this.y,
+      });
+    }
   }
 }

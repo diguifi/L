@@ -42,6 +42,7 @@ export default class GameScene extends Scene {
       color: '#2ecc71',
       myTurn: true,
       playerNumber: 1,
+      connectionManager: this.connectionManager,
     });
 
     this.player2 = new Player(<PlayerParams>{
@@ -52,6 +53,7 @@ export default class GameScene extends Scene {
       color: '#e74c3c',
       myTurn: false,
       playerNumber: 2,
+      connectionManager: this.connectionManager,
     });
     this.player2.rotate();
     this.player2.rotate();
@@ -64,6 +66,7 @@ export default class GameScene extends Scene {
       size: this.slotSize,
       color: '#f1c40f',
       coinNumber: 3,
+      connectionManager: this.connectionManager,
     });
 
     this.coin2 = new Coin(<CoinParams>{
@@ -73,6 +76,7 @@ export default class GameScene extends Scene {
       size: this.slotSize,
       color: '#f1c40f',
       coinNumber: 4,
+      connectionManager: this.connectionManager,
     });
 
     this.gameManager = new GameManager(this.player1, this.player2, this.coin1, this.coin2, this.board, this.maxTime, this.connectionManager);
@@ -85,6 +89,7 @@ export default class GameScene extends Scene {
       this.player2.update();
       this.coin1.update();
       this.coin2.update();
+      this.gameManager.update();
     }
   }
 

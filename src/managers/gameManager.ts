@@ -14,6 +14,8 @@ export default class GameManager {
   public coinRound: boolean = false;
   public selectingCoin: boolean = false;
   public coins: Coin[] = [];
+  public timerActive: boolean = false;
+  public connectionManager: ConnectionManager;
   private board: Board;
   private turnElement: HTMLElement = document.getElementById('turn');
   private errorsElement: HTMLElement = document.getElementById('errors');
@@ -24,7 +26,6 @@ export default class GameManager {
   private countdownTimer: any;
   private showingError: boolean = false;
   private inputManager: InputManager;
-  private connectionManager: ConnectionManager;
   private boardMatrix: any[] = [[3,1,1,0],
                                 [0,2,1,0],
                                 [0,2,1,0],
@@ -52,17 +53,23 @@ export default class GameManager {
 
     this.connectionManager = connectionManager;
 
-    this.timerController();
+    if (this.timerActive) {
+      this.timerController();
+    }
   }
 
   private activateCoinSelection(): void {
     this.selectingCoin = true;
     this.coins[0].active = true;
+
+    this.uploadStateType();
   }
 
   private activateCoinRound(): void {
     this.selectingCoin = false;
     this.coinRound = true;
+
+    this.uploadStateType();
   }
 
   private finishCoinRound(): void {
@@ -72,11 +79,18 @@ export default class GameManager {
   }
 
   private switchTurns(): void {
-    this.resetTimer();
+    if (this.timerActive) {
+      this.resetTimer();
+    }
+
     this.players[0].myTurn = !this.players[0].myTurn;
     this.players[1].myTurn = !this.players[1].myTurn;
 
     this.turnElement.innerHTML = `Turn: Player ${this.players[0].myTurn?'1' : '2'}`;
+
+    if (this.connectionManager.myTurn) {
+      this.uploadTurn(this.players[0].myTurn?1:2);
+    }
   }
 
   private validMove(): boolean {
@@ -138,6 +152,7 @@ export default class GameManager {
     }
     else {
       this.showError();
+      console.log(this.errorMessage)
     }
 
     return valid;
@@ -237,6 +252,10 @@ export default class GameManager {
 
   public changeGameState(): void {
     if (this.validMove()) {
+      if (this.connectionManager.myTurn) {
+        this.uploadGameState(true);
+      }
+
       this.updateBoardMatrix();
 
       if (!this.coinRound) {
@@ -256,6 +275,40 @@ export default class GameManager {
     this.coins.forEach(coin => {
       coin.active = !coin.active;
     });
+  }
+
+  public uploadTurn(turn: number) {
+    this.connectionManager.firebaseDB.ref(this.connectionManager.gameGuid).child('room').update({
+      turn: turn,
+    });
+  }
+
+  public uploadGameState(changed: boolean) {
+    this.connectionManager.firebaseDB.ref(this.connectionManager.gameGuid).child('room').update({
+      changedGameState: changed,
+    });
+  }
+
+  public uploadStateType() {
+    if (this.connectionManager.myTurn) {
+      this.connectionManager.firebaseDB.ref(this.connectionManager.gameGuid).child('room').update({
+        coinRound: this.coinRound,
+        selectingCoin: this.selectingCoin,
+      });
+    }
+  }
+
+  public update(): void {
+    if (!this.connectionManager.myTurn) {
+      this.coinRound = this.connectionManager.coinRound;
+      this.selectingCoin = this.connectionManager.selectingCoin;
+
+      if (this.connectionManager.changedGameState) {
+        this.changeGameState();
+        this.uploadGameState(false);
+        this.connectionManager.changedGameState = false;
+      }
+    }
   }
 
   public destroy(): void {

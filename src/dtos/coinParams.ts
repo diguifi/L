@@ -1,3 +1,5 @@
+import ConnectionManager from "../managers/connectionManager";
+
 export default interface CoinParams{
   context: CanvasRenderingContext2D;
   x: number;
@@ -5,4 +7,5 @@ export default interface CoinParams{
   size: number;
   color: string;
   coinNumber: number;
+  connectionManager: ConnectionManager;
 }

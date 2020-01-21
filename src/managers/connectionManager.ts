@@ -5,7 +5,34 @@ export default class ConnectionManager {
   public gameGuid: string;
   public connected: boolean = false;
   public error: boolean = false;
+  public errorMessage: string = '';
   public waitingPlayer: boolean = false;
+  public isHost: boolean = false;
+  public changedGameState: boolean = false;
+  public playerTurn: number = 1;
+  public myTurn: boolean = false;
+  public player1: any = {
+    rotation: 0,
+    inverted: false,
+    x: 0,
+    y: 0,
+  };
+  public player2: any = {
+    rotation: 0,
+    inverted: false,
+    x: 0,
+    y: 0,
+  };
+  public coin3: any = {
+    x: 0,
+    y: 0,
+  };
+  public coin4: any = {
+    x: 0,
+    y: 0,
+  };
+  public selectingCoin: boolean = false;
+  public coinRound: boolean = false;
   private path: string = '/game/';
 
   constructor () {
@@ -13,8 +40,42 @@ export default class ConnectionManager {
     this.initRoom();
   }
 
-  public initListeners(): void {
-    
+  public async initListeners(): Promise<void> {
+    this.firebaseDB.ref(this.gameGuid).on('value', async (snapshot: any) => {
+      this.player1.x = snapshot.val().room.player1.x;
+      this.player1.y = snapshot.val().room.player1.y;
+      this.player2.x = snapshot.val().room.player2.x;
+      this.player2.y = snapshot.val().room.player2.y;
+      this.player1.rotation = snapshot.val().room.player1.rotation;
+      this.player1.inverted = snapshot.val().room.player1.inverted;
+      this.player2.rotation = snapshot.val().room.player2.rotation;
+      this.player2.inverted = snapshot.val().room.player2.inverted;
+      this.coin3.x = snapshot.val().room.coin3.x;
+      this.coin3.y = snapshot.val().room.coin3.y;
+      this.coin4.x = snapshot.val().room.coin4.x;
+      this.coin4.y = snapshot.val().room.coin4.y;
+
+      this.selectingCoin = snapshot.val().room.selectingCoin;
+      this.coinRound = snapshot.val().room.coinRound;
+
+      if (snapshot.val().room.players == 2) {
+        this.connected = true;
+      }
+
+      this.changedGameState = snapshot.val().room.changedGameState;
+
+      if (this.playerTurn != snapshot.val().room.turn) {
+        this.playerTurn = snapshot.val().room.turn;
+      }
+
+      if (this.isHost && (this.playerTurn == 1)) {
+        this.myTurn = true;
+      } else if (!this.isHost && (this.playerTurn == 2)) {
+        this.myTurn = true;
+      } else {
+        this.myTurn = false;
+      }
+    });
   }
 
   private initFirebaseConfigs(): void {
@@ -48,14 +109,24 @@ export default class ConnectionManager {
     }
   }
 
-  private joinRoom(): void {
+  private async joinRoom(): Promise<void> {
     this.gameGuid = this.getUrlGuid();
 
-    this.firebaseDB.ref(this.gameGuid).once('value', snapshot => {
+    this.firebaseDB.ref(this.gameGuid).once('value', async(snapshot) => {
       if (snapshot.exists()){
-        this.connected = true;
+        if(snapshot.val().room.players != 2) {
+          this.connected = true;
+          this.initListeners();
+          this.firebaseDB.ref(this.gameGuid).child('room').update({
+            players: 2
+          });
+        } else {
+          this.error = true;
+          this.errorMessage = 'Room is full';
+        }
        } else {
         this.error = true;
+        this.errorMessage = 'Room not found!';
        }
     });
   }
@@ -68,11 +139,35 @@ export default class ConnectionManager {
         players: 1,
         turn: 1,
         winner: 0,
-        board: [],
+        changedGameState: false,
+        coinRound: false,
+        selectingCoin: false,
+        player1: {
+          rotation: 0,
+          inverted: false,
+          x: 50,
+          y: 0,
+        },
+        player2: {
+          rotation: 0,
+          inverted: false,
+          x: 0,
+          y: 0,
+        },
+        coin3: {
+          x: 0,
+          y: 0,
+        },
+        coin4: {
+          x: 0,
+          y: 0,
+        },
       },
     });
     this.updateUrl();
     this.waitingPlayer = true;
+    this.isHost = true;
+    this.initListeners();
   }
 
   private getUrlGuid(): string {

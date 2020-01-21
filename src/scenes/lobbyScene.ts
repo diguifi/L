@@ -17,7 +17,6 @@ export default class LobbyScene extends Scene {
     this.game.addGameScene(true, this.connectionManager);
     this.startedGame = true;
   }
-
   private drawConnecting(): void {
     this.context.textAlign = 'center';
     this.context.font = '30px Arial';
@@ -26,7 +25,7 @@ export default class LobbyScene extends Scene {
   private drawError(): void {
     this.context.textAlign = 'center';
     this.context.font = '30px Arial';
-    this.context.fillText('Room not found!', ((this.context.canvas.width) / 2), ((this.context.canvas.height) / 2));
+    this.context.fillText(this.connectionManager.errorMessage, ((this.context.canvas.width) / 2), ((this.context.canvas.height) / 2));
   }
   private drawWaiting(): void {
     this.context.textAlign = 'center';
@@ -38,7 +37,7 @@ export default class LobbyScene extends Scene {
 
   public update(): void {
     if (!this.destroyed && !this.startedGame) {
-      if (this.connectionManager.connected) {
+      if (this.connectionManager.connected && !this.connectionManager.error) {
         this.startGameScene();
       } else {
         if (this.connectionManager.error) {
