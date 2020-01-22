@@ -34,16 +34,6 @@ export default class Coin {
         this.firstTick = false;
         this.uploadCoinPosition();
       }
-      else {
-        if (this.coinNumber == 3){
-          this.x = this.connectionManager.coin3.x;
-          this.y = this.connectionManager.coin3.y;
-        }
-        else {
-          this.x = this.connectionManager.coin4.x;
-          this.y = this.connectionManager.coin4.y;
-        }
-      }
     }
   }
 
@@ -97,16 +87,18 @@ export default class Coin {
   }
 
   public uploadCoinPosition(): void {
-    if (this.connectionManager.isHost && (this.coinNumber == 3)) {
+    if (this.coinNumber == 3) {
       this.connectionManager.firebaseDB.ref(this.connectionManager.gameGuid).child('room').child('coin3').update({
         x: this.x,
         y: this.y,
+        active: this.active,
       });
     }
     else {
       this.connectionManager.firebaseDB.ref(this.connectionManager.gameGuid).child('room').child('coin4').update({
         x: this.x,
         y: this.y,
+        active: this.active,
       });
     }
   }

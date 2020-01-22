@@ -26,13 +26,16 @@ export default class ConnectionManager {
   public coin3: any = {
     x: 0,
     y: 0,
+    active: false,
   };
   public coin4: any = {
     x: 0,
     y: 0,
+    active: false,
   };
   public selectingCoin: boolean = false;
   public coinRound: boolean = false;
+  public updateTurnAfterStateChange: boolean = false;
   private query: string = '?game=';
 
   constructor () {
@@ -52,8 +55,12 @@ export default class ConnectionManager {
       this.player2.inverted = snapshot.val().room.player2.inverted;
       this.coin3.x = snapshot.val().room.coin3.x;
       this.coin3.y = snapshot.val().room.coin3.y;
+      this.coin3.active = snapshot.val().room.coin3.active;
       this.coin4.x = snapshot.val().room.coin4.x;
       this.coin4.y = snapshot.val().room.coin4.y;
+      this.coin4.active = snapshot.val().room.coin4.active;
+
+      this.updateTurnAfterStateChange = snapshot.val().room.updateTurnAfterStateChange;
 
       this.selectingCoin = snapshot.val().room.selectingCoin;
       this.coinRound = snapshot.val().room.coinRound;
@@ -142,6 +149,7 @@ export default class ConnectionManager {
         changedGameState: false,
         coinRound: false,
         selectingCoin: false,
+        updateTurnAfterStateChange: false,
         player1: {
           rotation: 0,
           inverted: false,
@@ -157,10 +165,12 @@ export default class ConnectionManager {
         coin3: {
           x: 0,
           y: 0,
+          active: false,
         },
         coin4: {
           x: 0,
           y: 0,
+          active: false,
         },
       },
     });

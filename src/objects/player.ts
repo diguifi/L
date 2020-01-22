@@ -4,10 +4,9 @@ import ConnectionManager from '../managers/connectionManager';
 
 export default class Player {
   private context: CanvasRenderingContext2D;
-  private rotation: number = 0;
-  private inverted: boolean = false;
-  private moved: boolean = false;
   private firstTick: boolean = true;
+  public rotation: number = 0;
+  public inverted: boolean = false;
   public connectionManager: ConnectionManager;
   public x: number;
   public y: number;
@@ -34,24 +33,9 @@ export default class Player {
     this.matrixPosition = this.calculatePositionOnMatrix();
 
     if (!this.connectionManager.myTurn) {
-
       if (this.firstTick) {
         this.firstTick = false;
         this.uploadPlayerPosition();
-      }
-      else {
-        if (this.playerNumber == 2){
-          this.rotation = this.connectionManager.player2.rotation;
-          this.inverted = this.connectionManager.player2.inverted;
-          this.x = this.connectionManager.player2.x;
-          this.y = this.connectionManager.player2.y;
-        }
-        else {
-          this.rotation = this.connectionManager.player1.rotation;
-          this.inverted = this.connectionManager.player1.inverted;
-          this.x = this.connectionManager.player1.x;
-          this.y = this.connectionManager.player1.y;
-        }
       }
     }
   }

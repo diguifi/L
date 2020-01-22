@@ -16,6 +16,7 @@ export default class GameManager {
   public coins: Coin[] = [];
   public timerActive: boolean = false;
   public connectionManager: ConnectionManager;
+  private updateTurnAfterStateChange: boolean = false;
   private board: Board;
   private turnElement: HTMLElement = document.getElementById('turn');
   private errorsElement: HTMLElement = document.getElementById('errors');
@@ -62,20 +63,21 @@ export default class GameManager {
     this.selectingCoin = true;
     this.coins[0].active = true;
 
-    this.uploadStateType();
+    this.uploadStateType(false);
   }
 
   private activateCoinRound(): void {
     this.selectingCoin = false;
     this.coinRound = true;
 
-    this.uploadStateType();
+    this.uploadStateType(false);
   }
 
   private finishCoinRound(): void {
     this.coinRound = false;
     this.coins[0].active = false;
     this.coins[1].active = false;
+    this.uploadStateType(false);
   }
 
   private switchTurns(): void {
@@ -89,7 +91,7 @@ export default class GameManager {
     this.turnElement.innerHTML = `Turn: Player ${this.players[0].myTurn?'1' : '2'}`;
 
     if (this.connectionManager.myTurn) {
-      this.uploadTurn(this.players[0].myTurn?1:2);
+      this.uploadStateType(true);
     }
   }
 
@@ -159,6 +161,8 @@ export default class GameManager {
   }
 
   private updateBoardMatrix(): void {
+    console.log(this.selectingCoin)
+    console.log(this.coinRound)
     if (!this.selectingCoin) {
       if (!this.coinRound) {
         this.players.forEach(player => {
@@ -239,6 +243,28 @@ export default class GameManager {
     this.inputManager.setGameOver();
   }
 
+  private updatePlayers(): void {
+    this.players[1].rotation = this.connectionManager.player2.rotation;
+    this.players[1].inverted = this.connectionManager.player2.inverted;
+    this.players[1].x = this.connectionManager.player2.x;
+    this.players[1].y = this.connectionManager.player2.y;
+  
+    this.players[0].rotation = this.connectionManager.player1.rotation;
+    this.players[0].inverted = this.connectionManager.player1.inverted;
+    this.players[0].x = this.connectionManager.player1.x;
+    this.players[0].y = this.connectionManager.player1.y;
+  }
+
+  private updateCoins(): void {
+    this.coins[1].x = this.connectionManager.coin4.x;
+    this.coins[1].y = this.connectionManager.coin4.y;
+    this.coins[1].active = this.connectionManager.coin4.active;
+
+    this.coins[0].x = this.connectionManager.coin3.x;
+    this.coins[0].y = this.connectionManager.coin3.y;
+    this.coins[0].active = this.connectionManager.coin3.active;
+  }
+
   private resetTimer(): void {
     clearInterval(this.countdownTimer);
     this.timeLeft = this.maxTime;
@@ -274,6 +300,7 @@ export default class GameManager {
   public changeActiveCoin(): void {
     this.coins.forEach(coin => {
       coin.active = !coin.active;
+      coin.uploadCoinPosition();
     });
   }
 
@@ -289,24 +316,42 @@ export default class GameManager {
     });
   }
 
-  public uploadStateType() {
+  public uploadStateType(updateTurnAfterStateChange: boolean) {
     if (this.connectionManager.myTurn) {
       this.connectionManager.firebaseDB.ref(this.connectionManager.gameGuid).child('room').update({
         coinRound: this.coinRound,
         selectingCoin: this.selectingCoin,
+        updateTurnAfterStateChange: updateTurnAfterStateChange,
+      });
+    }
+  }
+
+  public uploadTurnChange(updateTurnAfterStateChange: boolean) {
+    if (this.connectionManager.myTurn) {
+      this.connectionManager.firebaseDB.ref(this.connectionManager.gameGuid).child('room').update({
+        updateTurnAfterStateChange: updateTurnAfterStateChange,
       });
     }
   }
 
   public update(): void {
     if (!this.connectionManager.myTurn) {
-      this.coinRound = this.connectionManager.coinRound;
-      this.selectingCoin = this.connectionManager.selectingCoin;
+      this.updatePlayers();
+      this.updateCoins();
 
       if (this.connectionManager.changedGameState) {
         this.changeGameState();
         this.uploadGameState(false);
         this.connectionManager.changedGameState = false;
+      } else {
+        this.coinRound = this.connectionManager.coinRound;
+        this.selectingCoin = this.connectionManager.selectingCoin;
+      }
+      
+      if (this.connectionManager.updateTurnAfterStateChange) {
+        this.updateTurnAfterStateChange = false;
+        this.uploadTurnChange(false);
+        this.uploadTurn(this.players[0].myTurn?1:2);
       }
     }
   }
