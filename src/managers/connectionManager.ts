@@ -33,7 +33,7 @@ export default class ConnectionManager {
   };
   public selectingCoin: boolean = false;
   public coinRound: boolean = false;
-  private path: string = '/game/';
+  private query: string = '?game=';
 
   constructor () {
     this.initFirebaseConfigs();
@@ -97,7 +97,7 @@ export default class ConnectionManager {
   }
 
   private updateUrl(): void {
-    window.history.pushState('game', 'L', `${this.path}${this.gameGuid}`);
+    window.history.pushState('game', 'L', `${this.query}${this.gameGuid}`);
   }
 
   private initRoom(): void {
@@ -171,8 +171,11 @@ export default class ConnectionManager {
   }
 
   private getUrlGuid(): string {
-    const path = window.location.pathname;
-    return path.substring(this.path.length, path.length);
+    const url = window.location.href;
+    const paramIndex = url.indexOf(this.query) + this.query.length;
+    const queryGuid = url.substring(paramIndex);
+
+    return queryGuid;
   }
 
   private generateGuid(): string {
