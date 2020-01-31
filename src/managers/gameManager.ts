@@ -327,6 +327,7 @@ export default class GameManager {
   }
 
   public uploadFinishedTurn(turn: number) {
+    console.log(turn)
     if (this.connectionManager.myTurn) {
       this.connectionManager.firebaseDB.ref(this.connectionManager.gameGuid).child('room').update({
         turn: turn,
@@ -348,11 +349,10 @@ export default class GameManager {
         this.coinRound = this.connectionManager.coinRound;
         this.selectingCoin = this.connectionManager.selectingCoin;
       }
-      
-      if (this.connectionManager.updateTurnAfterStateChange) {
-        this.updateTurnAfterStateChange = false;
-        this.uploadFinishedTurn(this.players[0].myTurn?1:2);
-      }
+    }
+    if (this.connectionManager.updateTurnAfterStateChange) {
+      this.updateTurnAfterStateChange = false;
+      this.uploadFinishedTurn(this.players[0].myTurn?1:2);
     }
   }
 
