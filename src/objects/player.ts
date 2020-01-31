@@ -1,6 +1,7 @@
 import PlayerParams from '../dtos/playerParams';
 import { darken } from '../managers/colorManager';
 import ConnectionManager from '../managers/connectionManager';
+import PlayerFirebaseParams from '../dtos/playerFirebaseParams';
 
 export default class Player {
   private context: CanvasRenderingContext2D;
@@ -259,7 +260,8 @@ export default class Player {
 
   public uploadPlayerPosition(): void {
     if (this.connectionManager.isHost && (this.playerNumber == 1)) {
-      this.connectionManager.firebaseDB.ref(this.connectionManager.gameGuid).child('room').child('player1').update({
+      this.connectionManager.firebaseDB.ref(this.connectionManager.gameGuid).child('room').child('player1').update(
+      <PlayerFirebaseParams>{
         rotation: this.rotation,
         inverted: this.inverted,
         x: this.x,
@@ -267,7 +269,8 @@ export default class Player {
       });
     }
     else {
-      this.connectionManager.firebaseDB.ref(this.connectionManager.gameGuid).child('room').child('player2').update({
+      this.connectionManager.firebaseDB.ref(this.connectionManager.gameGuid).child('room').child('player2').update(
+      <PlayerFirebaseParams>{
         rotation: this.rotation,
         inverted: this.inverted,
         x: this.x,

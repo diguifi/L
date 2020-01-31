@@ -1,6 +1,7 @@
 import CoinParams from '../dtos/coinParams';
 import { darken } from '../managers/colorManager';
 import ConnectionManager from '../managers/connectionManager';
+import CoinFirebaseParams from '../dtos/coinFirebaseParams';
 
 export default class Coin {
   private context: CanvasRenderingContext2D;
@@ -88,14 +89,16 @@ export default class Coin {
 
   public uploadCoinPosition(): void {
     if (this.coinNumber == 3) {
-      this.connectionManager.firebaseDB.ref(this.connectionManager.gameGuid).child('room').child('coin3').update({
+      this.connectionManager.firebaseDB.ref(this.connectionManager.gameGuid).child('room').child('coin3').update(
+      <CoinFirebaseParams>{
         x: this.x,
         y: this.y,
         active: this.active,
       });
     }
     else {
-      this.connectionManager.firebaseDB.ref(this.connectionManager.gameGuid).child('room').child('coin4').update({
+      this.connectionManager.firebaseDB.ref(this.connectionManager.gameGuid).child('room').child('coin4').update(
+      <CoinFirebaseParams>{
         x: this.x,
         y: this.y,
         active: this.active,

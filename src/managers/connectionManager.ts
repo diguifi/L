@@ -1,4 +1,7 @@
 import * as firebase from 'firebase';
+import PlayerFirebaseParams from '../dtos/playerFirebaseParams';
+import CoinFirebaseParams from '../dtos/coinFirebaseParams';
+import RoomFirebaseParams from '../dtos/roomFirebaseParams';
 
 export default class ConnectionManager {
   public firebaseDB: any;
@@ -11,24 +14,24 @@ export default class ConnectionManager {
   public changedGameState: boolean = false;
   public playerTurn: number = 1;
   public myTurn: boolean = false;
-  public player1: any = {
+  public player1: PlayerFirebaseParams = {
     rotation: 0,
     inverted: false,
     x: 0,
     y: 0,
   };
-  public player2: any = {
+  public player2: PlayerFirebaseParams = {
     rotation: 0,
     inverted: false,
     x: 0,
     y: 0,
   };
-  public coin3: any = {
+  public coin3: CoinFirebaseParams = {
     x: 0,
     y: 0,
     active: false,
   };
-  public coin4: any = {
+  public coin4: CoinFirebaseParams = {
     x: 0,
     y: 0,
     active: false,
@@ -142,7 +145,7 @@ export default class ConnectionManager {
     this.gameGuid = this.generateGuid();
 
     this.firebaseDB.ref(this.gameGuid).set({
-      room: {
+      room: <RoomFirebaseParams>{
         players: 1,
         turn: 1,
         winner: 0,
@@ -150,24 +153,24 @@ export default class ConnectionManager {
         coinRound: false,
         selectingCoin: false,
         updateTurnAfterStateChange: false,
-        player1: {
+        player1: <PlayerFirebaseParams>{
           rotation: 0,
           inverted: false,
           x: 50,
           y: 0,
         },
-        player2: {
+        player2: <PlayerFirebaseParams>{
           rotation: 0,
           inverted: false,
           x: 0,
           y: 0,
         },
-        coin3: {
+        coin3: <CoinFirebaseParams>{
           x: 0,
           y: 0,
           active: false,
         },
-        coin4: {
+        coin4: <CoinFirebaseParams>{
           x: 0,
           y: 0,
           active: false,

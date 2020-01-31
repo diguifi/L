@@ -326,10 +326,11 @@ export default class GameManager {
     }
   }
 
-  public uploadTurnChange(updateTurnAfterStateChange: boolean) {
+  public uploadFinishedTurn(turn: number) {
     if (this.connectionManager.myTurn) {
       this.connectionManager.firebaseDB.ref(this.connectionManager.gameGuid).child('room').update({
-        updateTurnAfterStateChange: updateTurnAfterStateChange,
+        turn: turn,
+        updateTurnAfterStateChange: false,
       });
     }
   }
@@ -350,8 +351,7 @@ export default class GameManager {
       
       if (this.connectionManager.updateTurnAfterStateChange) {
         this.updateTurnAfterStateChange = false;
-        this.uploadTurnChange(false);
-        this.uploadTurn(this.players[0].myTurn?1:2);
+        this.uploadFinishedTurn(this.players[0].myTurn?1:2);
       }
     }
   }
