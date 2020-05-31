@@ -154,15 +154,15 @@ export default class GameManager {
     }
     else {
       this.showError();
-      console.log(this.errorMessage)
+      console.log('error: ' + this.errorMessage)
     }
 
     return valid;
   }
 
   private updateBoardMatrix(): void {
-    console.log(this.selectingCoin)
-    console.log(this.coinRound)
+    console.log('selecting coin: ' + this.selectingCoin)
+    console.log('coin round: ' + this.coinRound)
     if (!this.selectingCoin) {
       if (!this.coinRound) {
         this.players.forEach(player => {
@@ -327,7 +327,7 @@ export default class GameManager {
   }
 
   public uploadFinishedTurn(turn: number) {
-    console.log(turn)
+    console.log('turn: ' + turn)
     if (this.connectionManager.myTurn) {
       this.connectionManager.firebaseDB.ref(this.connectionManager.gameGuid).child('room').update({
         turn: turn,
